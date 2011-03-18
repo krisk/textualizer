@@ -207,7 +207,7 @@
                     // YES ==> keep the character in the DOM
                     // NO ==> remove the character from the DOM
                     var keepList = [];
-                    $.each(this.previous.chars, $.proxy(function (index, prevC) {
+                    $.each(this.previous.chars, function (index, prevC) {
                         var currC = current.get(prevC.char);
                         if (currC) {
                             currC.node = prevC.node;
@@ -218,7 +218,7 @@
                                 $(this).remove();
                             });
                         }
-                    }, this));
+                    });
 
                     // TODO: Let's figure out a proper, mathematically logical delay in between
                     // re-arranging the characters that need to be kept in view, to showing all the other
