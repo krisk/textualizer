@@ -29,7 +29,7 @@
             }
         }
 
-        var textItem = function () {
+        var blurb = function () {
             this.str;
             this.chars = [];
             this.get = function (c) {
@@ -70,7 +70,7 @@
             data: function (d) {
                 this.stop();
                 this.list = d;
-                this.textItems = [];
+                this.blurbs = [];
             }
             , start: function () {
                 if (!this.list && this.list.length === 0) {
@@ -88,7 +88,7 @@
                 this.intervalId = setInterval(function () {
                     if (index >= self.list.length) {
                         index = 0;
-                        $.each(self.textItems, function (i, item) {
+                        $.each(self.blurbs, function (i, item) {
                             item.reset();
                         });
                         self.rotate(index);
@@ -102,14 +102,14 @@
                 clearInterval(this.intervalId);
             }
             , rotate: function (index) {
-                var current = this.textItems[index];
+                var current = this.blurbs[index];
 
                 // If this is the first time the text is encountered, each character in the text is wrapped in
                 // a span and appended to an invisible container where the positioning is calculated.
                 if (!current) {
-                    current = new textItem();
+                    current = new blurb();
                     current.str = this.list[index];
-                    this.textItems.push(current);
+                    this.blurbs.push(current);
 
                     var stubList = [];
 
@@ -156,7 +156,7 @@
 
                     var self = this,
                         rearrangeDelay = self.options.rearrangeDuration + 200,
-                        appearDelay = rearrangeDelay + 500;
+                        appearDelay = self.options.rearrangeDuration;//rearrangeDelay + 500;
 
                     // Arrange the characters
                     setTimeout(function () {
