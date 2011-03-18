@@ -1,6 +1,5 @@
 ﻿(function ($) {
     $(document).ready(function () {
-
         // Custom effects
         var effects = {
             none: function (item) {
@@ -234,8 +233,8 @@
 
         $.fn.textualizer.defaults = {
             effect: 'random',
-            interval: 2000,
-            rearrangeDuration: 400
+            interval: 4000,
+            rearrangeDuration: 800
         };
     });
 })(jQuery);
