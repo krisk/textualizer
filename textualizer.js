@@ -165,7 +165,7 @@
                         }
                     }, this));
 					
-					// TODO: Let's figure out a proper, mathematically logical delay in between
+                    // TODO: Let's figure out a proper, mathematically logical delay in between
 					// re-arranging the characters that need to be kept in view, to showing all the other
 					// characters. 
                     var self = this,
