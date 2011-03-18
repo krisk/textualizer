@@ -41,7 +41,7 @@
                         options = args[1];
                     } else {
                         throw 'textualizer: invalid argument(s)';
-					}
+                    }
 
                     options = $.extend({}, $.fn.textualizer.defaults, options);
                     txtlzr = new Textualizer(ele, data, options);
