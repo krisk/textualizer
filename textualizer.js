@@ -40,7 +40,7 @@
                         data = args[0];
                         options = args[1];
                     } else {
-						throw 'textualizer: invalid argument(s)';
+                        throw 'textualizer: invalid argument(s)';
 					}
 
                     options = $.extend({}, $.fn.textualizer.defaults, options);
