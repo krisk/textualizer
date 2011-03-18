@@ -166,8 +166,8 @@
                     }, this));
 					
                     // TODO: Let's figure out a proper, mathematically logical delay in between
-					// re-arranging the characters that need to be kept in view, to showing all the other
-					// characters. 
+                    // re-arranging the characters that need to be kept in view, to showing all the other
+                    // characters. 
                     var self = this,
                         rearrangeDelay = self.options.rearrangeDuration + 200,
                         appearDelay = self.options.rearrangeDuration;//rearrangeDelay + 500;
