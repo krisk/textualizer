@@ -68,7 +68,7 @@
         // Effects for characters transition+animation.  Customize as you please
         $.fn.textualizer.effects = {
             none: function (item) {
-                this.container.append(item.node);
+                this.container.append(item.node.show());
             }
             , fadeIn: function (item) {
                 this.container.append(item.node.fadeIn(1000))
@@ -90,7 +90,7 @@
         // Copy all effects into an array ==> Makes randomization easy
         var effectList = [];
         for (var f in $.fn.textualizer.effects) {
-            if ($.fn.textualizer.effects.hasOwnProperty(f)) {
+            if (f !== 'none' && $.fn.textualizer.effects.hasOwnProperty(f)) {
                 effectList.push(f);
             }
         }
@@ -152,7 +152,7 @@
                 // Begin iterating through the list of texts to display
                 this.rotate(index++);
                 this.intervalId = setInterval(function () {
-                    if (index >= self.list.length) {
+                    if (index === self.list.length) {
                         index = 0;
                         $.each(self.blurbs, function (i, item) {
                             item.reset();
@@ -203,12 +203,15 @@
                 }
 
                 if (this.previous) {
-                    // For every character in the previous text, check if it exists in the curret text.
+                    // For every character in the previous text, check if it exists in the current text.
                     // YES ==> keep the character in the DOM
                     // NO ==> remove the character from the DOM
                     var keepList = [];
+                    console.log(index);
                     $.each(this.previous.chars, function (index, prevC) {
                         var currC = current.get(prevC.char);
+                        console.log(prevC.char, currC !== null);
+
                         if (currC) {
                             currC.node = prevC.node;
                             keepList.push({ node: currC.node, pos: currC.pos });
@@ -225,7 +228,7 @@
                     // characters. 
                     var self = this,
                         rearrangeDelay = self.options.rearrangeDuration + 200,
-                        appearDelay = self.options.rearrangeDuration; //rearrangeDelay + 500;
+                        appearDelay = rearrangeDelay + 500;
 
                     // Arrange the characters
                     setTimeout(function () {
@@ -255,9 +258,10 @@
                 for (var i = 0; i < item.chars.length; i++) {
                     var c = item.chars[i];
                     if (!c.__inserted) {
+                        console.log(c);
                         (function (item) {
                             setTimeout(function () {
-                                item.node.css({ 'left': item.pos.left, 'top': item.pos.top });
+                                item.node.show().css({ 'left': item.pos.left, 'top': item.pos.top });
                                 effect.call(self, item);
                             }, Math.random() * 500);
                         })(c);
