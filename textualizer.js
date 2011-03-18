@@ -207,11 +207,8 @@
                     // YES ==> keep the character in the DOM
                     // NO ==> remove the character from the DOM
                     var keepList = [];
-                    console.log(index);
                     $.each(this.previous.chars, function (index, prevC) {
                         var currC = current.get(prevC.char);
-                        console.log(prevC.char, currC !== null);
-
                         if (currC) {
                             currC.node = prevC.node;
                             keepList.push({ node: currC.node, pos: currC.pos });
@@ -258,7 +255,6 @@
                 for (var i = 0; i < item.chars.length; i++) {
                     var c = item.chars[i];
                     if (!c.__inserted) {
-                        console.log(c);
                         (function (item) {
                             setTimeout(function () {
                                 item.node.show().css({ 'left': item.pos.left, 'top': item.pos.top });
