@@ -11,8 +11,62 @@
 */
 (function ($) {
     $(document).ready(function () {
-        // Custom effects
-        var effects = {
+        /**
+        * Overloads:
+        * 	1. textualizer(data, options)
+        * 	2. textualizer(data)
+        * 	3. textualizer(options) 
+        *
+        * @param data: Array of texts to transition
+        * @param options:  
+        *	<effect> - name of the effect to apply: random, fadeIn, slideLeft, slideTop. 
+        *	<interval> - Time (ms) between transitions
+        *	<rearrangeDuration> - Time (ms) for characters to arrange into position
+        */
+        $.fn.textualizer = function (data, options) {
+            var args = arguments;
+
+            function get(ele) {
+                var txtlzr = ele.data('textualizer');
+                if (!txtlzr) {
+                    var data = [],
+                        options;
+
+                    if (args.length === 1 && args[0] instanceof Array) {
+                        data = args[0];
+                    } else if (args.length === 1 && typeof args[0] === 'object') {
+                        options = args[0];
+                    } else if (args.length === 2) {
+                        data = args[0];
+                        options = args[1];
+                    } else {
+						throw 'textualizer: invalid argument(s)';
+					}
+
+                    options = $.extend({}, $.fn.textualizer.defaults, options);
+                    txtlzr = new Textualizer(ele, data, options);
+                    ele.data('textualizer', txtlzr);
+                }
+                return txtlzr;
+            }
+
+            var txtlzr = get(this);
+
+            if (typeof args[0] === 'string' && txtlzr[args[0]]) {
+                txtlzr[args[0]].apply(txtlzr, Array.prototype.slice.call(args, 1));
+            }
+
+            return this;
+        }
+
+        $.fn.textualizer.defaults = {
+            effect: 'random',
+            interval: 4000,
+            rearrangeDuration: 800
+        };
+
+        // Effects for characters transition+animation.  Customize as you please
+        $.fn.textualizer.effects = {
             none: function (item) {
                 this.container.append(item.node);
             }
@@ -33,9 +87,10 @@
             }
         }
 
+        // Copy all effects into an array ==> Makes randomization easy
         var effectList = [];
-        for (var f in effects) {
-            if (effects.hasOwnProperty(f)) {
+        for (var f in $.fn.textualizer.effects) {
+            if ($.fn.textualizer.effects.hasOwnProperty(f)) {
                 effectList.push(f);
             }
         }
@@ -164,13 +219,13 @@
                             });
                         }
                     }, this));
-					
+
                     // TODO: Let's figure out a proper, mathematically logical delay in between
                     // re-arranging the characters that need to be kept in view, to showing all the other
                     // characters. 
                     var self = this,
                         rearrangeDelay = self.options.rearrangeDuration + 200,
-                        appearDelay = self.options.rearrangeDuration;//rearrangeDelay + 500;
+                        appearDelay = self.options.rearrangeDuration; //rearrangeDelay + 500;
 
                     // Arrange the characters
                     setTimeout(function () {
@@ -194,8 +249,8 @@
             showChars: function (item) {
                 var self = this;
                 var effect = this.options.effect === 'random' ?
-                    effects[effectList[Math.floor(Math.random() * effectList.length)]] :
-                    effects[this.options.effect];
+                    $.fn.textualizer.effects[effectList[Math.floor(Math.random() * effectList.length)]] :
+                    $.fn.textualizer.effects[this.options.effect];
 
                 for (var i = 0; i < item.chars.length; i++) {
                     var c = item.chars[i];
@@ -210,45 +265,5 @@
                 }
             }
         }
-
-        $.fn.textualizer = function (/*data, options*/) {
-            var args = arguments;
-
-            function get(ele) {
-                var txtlzr = ele.data('textualizer');
-                if (!txtlzr) {
-                    var data = [],
-                        options;
-
-                    if (args.length === 1 && args[0] instanceof Array) {
-                        data = args[0];
-                    } else if (args.length === 1 && typeof args[0] === 'object') {
-                        options = args[0];
-                    } else if (args.length === 2) {
-                        data = args[0];
-                        options = args[1];
-                    }
-
-                    options = $.extend({}, $.fn.textualizer.defaults, options);
-                    txtlzr = new Textualizer(ele, data, options);
-                    ele.data('textualizer', txtlzr);
-                }
-                return txtlzr;
-            }
-
-            var txtlzr = get(this);
-
-            if (typeof args[0] === 'string' && txtlzr[args[0]]) {
-                txtlzr[args[0]].apply(txtlzr, Array.prototype.slice.call(args, 1));
-            }
-
-            return this;
-        }
-
-        $.fn.textualizer.defaults = {
-            effect: 'random',
-            interval: 4000,
-            rearrangeDuration: 800
-        };
     });
 })(jQuery);
