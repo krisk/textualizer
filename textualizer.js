@@ -248,6 +248,15 @@
                 }
                 this.previous = current;
             }
+            , destroy: function () {
+                this.stop();
+                this.container
+                    .parent()
+                        .removeData('textualizer')
+                    .end()
+                    .remove();
+                this.phantomContainer.remove();
+            }
         }
 
         var methods = {
@@ -262,7 +271,7 @@
                         (function (c) {
                             setTimeout(function () {
                                 c.node.show().css({ 'left': c.pos.left, 'top': c.pos.top });
-                                effect.call(self, item);
+                                effect.call(self, c);
                             }, Math.random() * 500);
                         })(char);
                     }
