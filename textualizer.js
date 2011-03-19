@@ -89,11 +89,11 @@
 
         // Copy all effects into an array ==> Makes randomization easy
         var effectList = [];
-        for (var f in $.fn.textualizer.effects) {
-            if (f !== 'none' && $.fn.textualizer.effects.hasOwnProperty(f)) {
-                effectList.push(f);
+        $.each($.fn.textualizer.effects, function (key, value) {
+            if (key !== 'none') {
+                effectList.push(key);
             }
-        }
+        });
 
         var blurb = function () {
             this.str;
@@ -119,17 +119,22 @@
         var Textualizer = function (element, data, options) {
             this.options = options;
 
+            // Contains transitioning text
             this.container = $('<div />')
                 .css('position', 'relative')
                 .appendTo(element);
 
+            // Used for initial positioning calculation
             this.phantomContainer = $('<div />')
                 .css({ 'position': 'relative', 'visibility': 'hidden' })
                 .appendTo(element.clone().appendTo(document.body))
 
+            // Holds the previous text
             this.previous;
 
-            this.data(data);
+            if (data && data instanceof Array) {
+                this.data(data);
+            }
         }
 
         Textualizer.prototype = {
@@ -139,7 +144,7 @@
                 this.blurbs = [];
             }
             , start: function () {
-                if (!this.list && this.list.length === 0) {
+                if (!this.list || this.list.length === 0) {
                     return;
                 }
 
@@ -247,22 +252,21 @@
 
         var methods = {
             showChars: function (item) {
-                var self = this;
-                var effect = this.options.effect === 'random' ?
-                    $.fn.textualizer.effects[effectList[Math.floor(Math.random() * effectList.length)]] :
-                    $.fn.textualizer.effects[this.options.effect];
+                var self = this,
+                    effect = this.options.effect === 'random' ?
+                            $.fn.textualizer.effects[effectList[Math.floor(Math.random() * effectList.length)]] :
+                            $.fn.textualizer.effects[this.options.effect];
 
-                for (var i = 0; i < item.chars.length; i++) {
-                    var c = item.chars[i];
-                    if (!c.__inserted) {
-                        (function (item) {
+                $.each(item.chars, function (index, char) {
+                    if (!char.__inserted) {
+                        (function (c) {
                             setTimeout(function () {
-                                item.node.show().css({ 'left': item.pos.left, 'top': item.pos.top });
+                                c.node.show().css({ 'left': c.pos.left, 'top': c.pos.top });
                                 effect.call(self, item);
                             }, Math.random() * 500);
-                        })(c);
+                        })(char);
                     }
-                }
+                });
             }
         }
     });
