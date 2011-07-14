@@ -68,12 +68,12 @@
         var COMMON_CHARACTER_ARRANGE_DELAY = 1000,
             REMAINING_CHARACTERS_DELAY = 500,
             EFFECT_DURATION = 2000,
-            REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY = 2000;
+            REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY = 2000,
+            REMOVE_CHARACTERS_MAX_DELAY = 2000;
 
         // Effects for characters transition+animation. Customize as you please
         $.fn.textualizer.effects = {
             none: function (item) {
-                console.log('NONE');
                 this.container.append(item.node.show());
             }
             , fadeIn: function (item) {
@@ -136,6 +136,8 @@
 
         var Textualizer = function (element, data, options) {
             this.options = options;
+
+            this._parent = element.parent();
 
             // Contains transitioning text
             this.container = $('<div />')
@@ -259,11 +261,12 @@
                         } else {
                             var d = $.Deferred();
                             removeList.push(d);
-                            prevC.node.fadeOut('slow', function () {
-                                $(this).remove();
-                                d.resolve();
-                            });
-
+                            prevC.node
+                                .delay(Math.random() * REMOVE_CHARACTERS_MAX_DELAY)
+                                .fadeOut(1000, function () {
+                                    $(this).remove();
+                                    d.resolve();
+                                })
                         }
                     });
 
