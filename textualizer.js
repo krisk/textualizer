@@ -61,12 +61,14 @@
 
         $.fn.textualizer.defaults = {
             effect: 'random',
-            interval: 1000,
+            interval: 3000,
+            rearrangeDuration: 1000
         };
 
         var COMMON_CHARACTER_ARRANGE_DELAY = 1000,
             REMAINING_CHARACTERS_DELAY = 500,
-            EFFECT_DURATION = 1000;
+            EFFECT_DURATION = 2000,
+            REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY = 2000;
 
         // Effects for characters transition+animation. Customize as you please
         $.fn.textualizer.effects = {
@@ -104,8 +106,8 @@
             this.chars = []; // Array of char objects
         }
         Blurb.prototype = {
-           // Loops through chars, and find the first char whose character matches c, and hasn't been already used.
-            get : function (c) {
+            // Loops through chars, and find the first char whose character matches c, and hasn't been already used.
+            get: function (c) {
                 for (var i = 0, len = this.chars.length; i < len; i++) {
                     var l = this.chars[i];
                     if (l.char === c && !l.used) {
@@ -116,7 +118,7 @@
                 return null;
             }
             // Resets ever character in chars
-            , reset : function () {
+            , reset: function () {
                 $.each(this.chars, function (index, char) {
                     char.inserted = false;
                     char.used = false;
@@ -128,7 +130,7 @@
             this.char = null; // A character
             this.node = null; // The span element that wraps around the character
             this.pos = null;  // The node position
-            this.used = false;    
+            this.used = false;
             this.inserted = false;
         }
 
@@ -196,7 +198,7 @@
                 // Begin iterating through the list of blurbs to display
                 rotate(index);
             }
-            , pause: function() {
+            , pause: function () {
                 this._pause = true;
             }
             , _rotate: function (index) {
@@ -207,7 +209,7 @@
                 // a span and appended to an invisible container where the positioning is calculated.
                 if (!current) {
                     var phantomBlurbs = [];
-                    
+
                     current = new Blurb();
                     current.str = this.list[index];
                     this.blurbs.push(current);
@@ -221,7 +223,7 @@
                             c.char = char;
                             c.node = $('<span/>').text(char);
 
-                            this.phantomContainer.append(c.node);                                                       
+                            this.phantomContainer.append(c.node);
                             phantomBlurbs.push(c);
                         }
                     }, this));
@@ -261,14 +263,14 @@
                                 $(this).remove();
                                 d.resolve();
                             });
-                           
+
                         }
                     });
 
                     // When all characters that's arent common to the blurbs have been removed...
-                    $.when.apply(null, removeList).done(function() {
+                    $.when.apply(null, removeList).done(function () {
                         // Move charactes that are common to their new position
-                        setTimeout(function() {
+                        setTimeout(function () {
                             $.each(keepList, function (index, item) {
                                 item.node.animate({ 'left': item.pos.left, 'top': item.pos.top }, self.options.rearrangeDuration);
                                 dfds.push(item.node);
@@ -321,7 +323,7 @@
                         char.node
                             .show()
                             .css({ 'left': char.pos.left, 'top': char.pos.top })
-                            .delay(Math.random() * 500);
+                            .delay(Math.random() * REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY);
 
                         effect.call(self, char);
 
