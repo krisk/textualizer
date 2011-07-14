@@ -179,7 +179,7 @@
                         return;
                     }
                     // _rotate returns a promise, which completes when a blurb has finished animating.  When that 
-                    // promise if fulfilled, transition to the next blurb.
+                    // promise is fulfilled, transition to the next blurb.
                     self._rotate(i)
                         .done(function () {
                             setTimeout(function () {
