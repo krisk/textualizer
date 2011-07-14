@@ -7,7 +7,7 @@
 * Copyright 2011, Kirollos Risk
 * Dual licensed under the MIT or GPL Version 2 licenses.
 *
-* Date: March 17, 2011
+* Date: July 14, 2011
 */
 (function ($) {
     $(document).ready(function () {
