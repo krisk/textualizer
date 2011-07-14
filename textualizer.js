@@ -1,4 +1,4 @@
-﻿/*!
+/*!
 * Textualizer v1.0
 *
 * Dependencies:
@@ -13,15 +13,15 @@
     $(document).ready(function () {
         /**
         * Overloads:
-        * 	1. textualizer(data, options)
-        * 	2. textualizer(data)
-        * 	3. textualizer(options) 
+        * 1. textualizer(data, options)
+        * 2. textualizer(data)
+        * 3. textualizer(options)
         *
         * @param data: Array of texts to transition
-        * @param options:  
-        *	<effect> - name of the effect to apply: random, fadeIn, slideLeft, slideTop. 
-        *	<interval> - Time (ms) between transitions
-        *	<rearrangeDuration> - Time (ms) for characters to arrange into position
+        * @param options:
+        * <effect> - name of the effect to apply: random, fadeIn, slideLeft, slideTop.
+        * <interval> - Time (ms) between transitions
+        * <rearrangeDuration> - Time (ms) for characters to arrange into position
         */
         $.fn.textualizer = function (data, options) {
             var args = arguments;
@@ -61,29 +61,33 @@
 
         $.fn.textualizer.defaults = {
             effect: 'random',
-            interval: 4000,
-            rearrangeDuration: 800
+            interval: 1000,
         };
 
-        // Effects for characters transition+animation.  Customize as you please
+        var COMMON_CHARACTER_ARRANGE_DELAY = 1000,
+            REMAINING_CHARACTERS_DELAY = 500,
+            EFFECT_DURATION = 1000;
+
+        // Effects for characters transition+animation. Customize as you please
         $.fn.textualizer.effects = {
             none: function (item) {
+                console.log('NONE');
                 this.container.append(item.node.show());
             }
             , fadeIn: function (item) {
-                this.container.append(item.node.fadeIn(1000))
+                this.container.append(item.node.fadeIn(EFFECT_DURATION))
             }
             , slideLeft: function (item) {
                 item.node
                     .appendTo(this.container)
                     .css({ 'left': -1000 })
-                    .animate({ 'left': item.pos.left }, 1000);
+                    .animate({ 'left': item.pos.left }, EFFECT_DURATION);
             }
             , slideTop: function (item) {
                 item.node
                     .appendTo(this.container)
                     .css({ 'top': -1000 })
-                    .animate({ 'top': item.pos.top }, 1000);
+                    .animate({ 'top': item.pos.top }, EFFECT_DURATION);
             }
         }
 
@@ -95,25 +99,37 @@
             }
         });
 
-        var blurb = function () {
-            this.str;
-            this.chars = [];
-            this.get = function (c) {
+        var Blurb = function () {
+            this.str;  // The text string
+            this.chars = []; // Array of char objects
+        }
+        Blurb.prototype = {
+           // Loops through chars, and find the first char whose character matches c, and hasn't been already used.
+            get : function (c) {
                 for (var i = 0, len = this.chars.length; i < len; i++) {
                     var l = this.chars[i];
-                    if (l.char === c && !l.__used) {
-                        l.__used = true;
+                    if (l.char === c && !l.used) {
+                        l.used = true;  // Mark as used.  
                         return l;
                     }
                 }
                 return null;
-            };
-            this.reset = function () {
+            }
+            // Resets ever character in chars
+            , reset : function () {
                 $.each(this.chars, function (index, char) {
-                    char.__inserted = false;
-                    char.__used = false;
+                    char.inserted = false;
+                    char.used = false;
                 });
             }
+        }
+
+        var Char = function () {
+            this.char = null; // A character
+            this.node = null; // The span element that wraps around the character
+            this.pos = null;  // The node position
+            this.used = false;    
+            this.inserted = false;
         }
 
         var Textualizer = function (element, data, options) {
@@ -130,7 +146,7 @@
                 .appendTo(element.clone().appendTo(document.body))
 
             // Holds the previous text
-            this.previous;
+            this._previous = null;
 
             if (data && data instanceof Array) {
                 this.data(data);
@@ -139,117 +155,147 @@
 
         Textualizer.prototype = {
             data: function (d) {
-                this.stop();
                 this.list = d;
                 this.blurbs = [];
             }
             , start: function () {
+                // If there are no items, then simply exit
                 if (!this.list || this.list.length === 0) {
                     return;
                 }
 
-                var index = 0,
-                    self = this,
-                    rearrangeDelay = self.options.rearrangeDuration + 200,
-                    appearDelay = rearrangeDelay + 500,
-                    interval = this.options.interval + rearrangeDelay + appearDelay;
+                var self = this,
+                    index = this._index || 0;
 
-                // Begin iterating through the list of texts to display
-                this.rotate(index++);
-                this.intervalId = setInterval(function () {
-                    if (index === self.list.length) {
-                        index = 0;
-                        $.each(self.blurbs, function (i, item) {
-                            item.reset();
-                        });
-                        self.rotate(index);
-                    } else {
-                        self.rotate(index);
+                this._pause = false;
+
+                // Begin transitioning through the items
+                function rotate(i) {
+                    if (self._pause) {
+                        return;
                     }
-                    index++;
-                }, interval);
+                    // _rotate returns a promise, which completes when a blurb has finished animating.  When that 
+                    // promise if fulfilled, transition to the next blurb.
+                    self._rotate(i)
+                        .done(function () {
+                            setTimeout(function () {
+                                // If we've reached the last blurb, reset the position of every character in every blurb
+                                if (i === self.list.length - 1) {
+                                    i = -1;
+                                    $.each(self.blurbs, function (j, item) {
+                                        item.reset();
+                                    });
+                                }
+                                i++;
+                                self._index = i;
+                                rotate(i); // rotate the next blurb
+                            }, self.options.interval);
+                        });
+                }
+
+                // Begin iterating through the list of blurbs to display
+                rotate(index);
             }
-            , stop: function () {
-                clearInterval(this.intervalId);
+            , pause: function() {
+                this._pause = true;
             }
-            , rotate: function (index) {
-                var current = this.blurbs[index];
+            , _rotate: function (index) {
+                var dfd = $.Deferred(),
+                    current = this.blurbs[index];
 
                 // If this is the first time the text is encountered, each character in the text is wrapped in
                 // a span and appended to an invisible container where the positioning is calculated.
                 if (!current) {
-                    current = new blurb();
+                    var phantomBlurbs = [];
+                    
+                    current = new Blurb();
                     current.str = this.list[index];
                     this.blurbs.push(current);
 
-                    var stubList = [];
-
-                    // Add all chars first to the phantom container.  Let the browser deal with the formatting.
+                    // Add all chars first to the phantom container. Let the browser deal with the formatting.
                     $.each(current.str, $.proxy(function (index, char) {
                         if (char === '') {
                             this.phantomContainer.append(' ');
                         } else {
-                            var node = $('<span/>').text(char);
-                            this.phantomContainer.append(node);
-                            stubList.push({ char: char, node: node });
+                            var c = new Char();
+                            c.char = char;
+                            c.node = $('<span/>').text(char);
+
+                            this.phantomContainer.append(c.node);                                                       
+                            phantomBlurbs.push(c);
                         }
                     }, this));
 
-                    // Figure out positioning, and clone the text
-                    $.each(stubList, function (index, stub) {
-                        var pos = stub.node.position();
-                        var l = stub.node.clone();
+                    // Figure out the positioning, and clone the DOM node
+                    $.each(phantomBlurbs, function (index, c) {
+                        c.pos = c.node.position();
+                        c.node = c.node.clone();
 
-                        l.css({ 'left': pos.left, 'top': pos.top, 'position': 'absolute' });
-                        current.chars.push({ char: stub.char, node: l, pos: pos })
+                        c.node.css({ 'left': c.pos.left, 'top': c.pos.top, 'position': 'absolute' });
+                        current.chars.push(c);
                     });
 
                     this.phantomContainer.html('');
                 }
 
-                if (this.previous) {
+                if (this._previous) {
                     // For every character in the previous text, check if it exists in the current text.
                     // YES ==> keep the character in the DOM
                     // NO ==> remove the character from the DOM
-                    var keepList = [];
-                    $.each(this.previous.chars, function (index, prevC) {
+                    var self = this,
+                        keepList = [],
+                        removeList = [],
+                        dfds = [];
+
+                    $.each(this._previous.chars, function (index, prevC) {
                         var currC = current.get(prevC.char);
                         if (currC) {
-                            currC.node = prevC.node;
-                            keepList.push({ node: currC.node, pos: currC.pos });
-                            currC.__inserted = true;
+                            currC.node = prevC.node; // use the previous DOM node
+                            currC.inserted = true;
+
+                            keepList.push(currC);
                         } else {
+                            var d = $.Deferred();
+                            removeList.push(d);
                             prevC.node.fadeOut('slow', function () {
                                 $(this).remove();
+                                d.resolve();
                             });
+                           
                         }
                     });
 
-                    // TODO: Let's figure out a proper, mathematically logical delay in between
-                    // re-arranging the characters that need to be kept in view, to showing all the other
-                    // characters. 
-                    var self = this,
-                        rearrangeDelay = self.options.rearrangeDuration + 200,
-                        appearDelay = rearrangeDelay + 500;
+                    // When all characters that's arent common to the blurbs have been removed...
+                    $.when.apply(null, removeList).done(function() {
+                        // Move charactes that are common to their new position
+                        setTimeout(function() {
+                            $.each(keepList, function (index, item) {
+                                item.node.animate({ 'left': item.pos.left, 'top': item.pos.top }, self.options.rearrangeDuration);
+                                dfds.push(item.node);
+                            });
+                            // When all the characters have moved to their new position, show the remaining characters
+                            $.when.apply(null, dfds).done(function () {
+                                setTimeout(function () {
+                                    methods.showChars.call(self, current)
+                                        .done(function () {
+                                            dfd.resolve();
+                                        });
+                                }, REMAINING_CHARACTERS_DELAY);
+                            });
+                        }, COMMON_CHARACTER_ARRANGE_DELAY);
+                    });
 
-                    // Arrange the characters
-                    setTimeout(function () {
-                        // Move charactes that already exist to their proper position
-                        $.each(keepList, function (index, item) {
-                            item.node.animate({ 'left': item.pos.left, 'top': item.pos.top }, self.options.rearrangeDuration);
-                        });
-                        // Show all the other characters
-                        setTimeout(function () {
-                            methods.showChars.call(self, current);
-                        }, appearDelay);
-                    }, rearrangeDelay);
                 } else {
-                    methods.showChars.call(this, current);
+                    methods.showChars.call(this, current)
+                        .done(function () {
+                            dfd.resolve();
+                        });
                 }
-                this.previous = current;
+                this._previous = current;
+
+                return dfd.promise();
             }
             , destroy: function () {
-                this.stop();
                 this.container
                     .parent()
                         .removeData('textualizer')
@@ -264,18 +310,32 @@
                 var self = this,
                     effect = this.options.effect === 'random' ?
                             $.fn.textualizer.effects[effectList[Math.floor(Math.random() * effectList.length)]] :
-                            $.fn.textualizer.effects[this.options.effect];
+                            $.fn.textualizer.effects[this.options.effect],
+                    dfd = $.Deferred(),
+                    dfds = [];
 
+                // Iterate through all char objects
                 $.each(item.chars, function (index, char) {
-                    if (!char.__inserted) {
-                        (function (c) {
-                            setTimeout(function () {
-                                c.node.show().css({ 'left': c.pos.left, 'top': c.pos.top });
-                                effect.call(self, c);
-                            }, Math.random() * 500);
-                        })(char);
+                    // If the character has not been already inserted, animate it, with a delay
+                    if (!char.inserted) {
+                        char.node
+                            .show()
+                            .css({ 'left': char.pos.left, 'top': char.pos.top })
+                            .delay(Math.random() * 500);
+
+                        effect.call(self, char);
+
+                        // Push the character we animate it to deferred list.
+                        dfds.push(char.node);
                     }
                 });
+
+                // When all characters have been showed, resolve the promise
+                $.when.apply(null, dfds).done(function () {
+                    dfd.resolve();
+                });
+
+                return dfd.promise();
             }
         }
     });
