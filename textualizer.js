@@ -20,7 +20,7 @@
         * @param data: Array of texts to transition
         * @param options:
         * <effect> - name of the effect to apply: random, fadeIn, slideLeft, slideTop.
-        * <interval> - Time (ms) between transitions
+        * <duration> - Time (ms) to keep a blurb on the screen before transitioning to the next one
         * <rearrangeDuration> - Time (ms) for characters to arrange into position
         */
         $.fn.textualizer = function (data, options) {
@@ -61,7 +61,7 @@
 
         $.fn.textualizer.defaults = {
             effect: 'random',
-            interval: 3000,
+            duration: 500,
             rearrangeDuration: 1000
         };
 
@@ -152,6 +152,11 @@
             // Holds the previous text
             this._previous = null;
 
+            this._position = this._parent.position();
+            this._position.bottom = this._position.top + this._parent.height();
+
+            this.blurbs = [];
+
             if (data && data instanceof Array) {
                 this.data(data);
             }
@@ -159,6 +164,7 @@
 
         Textualizer.prototype = {
             data: function (d) {
+                this.stop();
                 this.list = d;
                 this.blurbs = [];
             }
@@ -193,12 +199,19 @@
                                 i++;
                                 self._index = i;
                                 rotate(i); // rotate the next blurb
-                            }, self.options.interval);
+                            }, self.options.duration);
                         });
                 }
 
                 // Begin iterating through the list of blurbs to display
                 rotate(index);
+            }
+            , stop: function () {
+                this.pause();
+                this._previous = null;
+                this._index = 0;
+                this.container.empty();
+                this.phantomContainer.empty();
             }
             , pause: function () {
                 this._pause = true;
@@ -251,6 +264,20 @@
                         removeList = [],
                         dfds = [];
 
+                    var eff = [
+                            function (target) {
+                                var _d = $.Deferred();
+                                target.animate({ top: self._position.bottom, opacity: 'hide' }, _d.resolve);
+                                return _d.promise();
+                            }
+                            , function (target) {
+                                var _d = $.Deferred();
+                                target.fadeOut(1000, _d.resolve);
+                                return _d.promise();
+                            } ];
+
+                    var randomHideEffect = eff[Math.floor(Math.random() * eff.length)];
+
                     $.each(this._previous.chars, function (index, prevC) {
                         var currC = current.get(prevC.char);
                         if (currC) {
@@ -261,12 +288,14 @@
                         } else {
                             var d = $.Deferred();
                             removeList.push(d);
+
                             prevC.node
                                 .delay(Math.random() * REMOVE_CHARACTERS_MAX_DELAY)
-                                .fadeOut(1000, function () {
-                                    $(this).remove();
-                                    d.resolve();
-                                })
+
+                            randomHideEffect(prevC.node).done(function () {
+                                prevC.node.remove();
+                                d.resolve();
+                            });
                         }
                     });
 
