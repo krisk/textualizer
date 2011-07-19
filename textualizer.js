@@ -264,19 +264,7 @@
                         removeList = [],
                         dfds = [];
 
-                    var eff = [
-                            function (target) {
-                                var _d = $.Deferred();
-                                target.animate({ top: self._position.bottom, opacity: 'hide' }, _d.resolve);
-                                return _d.promise();
-                            }
-                            , function (target) {
-                                var _d = $.Deferred();
-                                target.fadeOut(1000, _d.resolve);
-                                return _d.promise();
-                            } ];
-
-                    var randomHideEffect = eff[Math.floor(Math.random() * eff.length)];
+                    var randomHideEffect = getRandomHideEffect.call(this);
 
                     $.each(this._previous.chars, function (index, prevC) {
                         var currC = current.get(prevC.char);
@@ -289,13 +277,11 @@
                             var d = $.Deferred();
                             removeList.push(d);
 
-                            prevC.node
-                                .delay(Math.random() * REMOVE_CHARACTERS_MAX_DELAY)
-
-                            randomHideEffect(prevC.node).done(function () {
-                                prevC.node.remove();
-                                d.resolve();
-                            });
+                            randomHideEffect(prevC.node.delay(Math.random() * REMOVE_CHARACTERS_MAX_DELAY))
+                                .done(function () {
+                                    prevC.node.remove();
+                                    d.resolve();
+                                });
                         }
                     });
 
@@ -310,7 +296,7 @@
                             // When all the characters have moved to their new position, show the remaining characters
                             $.when.apply(null, dfds).done(function () {
                                 setTimeout(function () {
-                                    methods.showChars.call(self, current)
+                                    showCharacters.call(self, current)
                                         .done(function () {
                                             dfd.resolve();
                                         });
@@ -320,7 +306,7 @@
                     });
 
                 } else {
-                    methods.showChars.call(this, current)
+                    showCharacters.call(this, current)
                         .done(function () {
                             dfd.resolve();
                         });
@@ -339,38 +325,56 @@
             }
         }
 
-        var methods = {
-            showChars: function (item) {
-                var self = this,
+        function getRandomHideEffect() {
+            var self = this;
+            var eff = [
+                function (target) {
+                    var _d = $.Deferred();
+                    target.animate({ top: self._position.bottom, opacity: 'hide' }, _d.resolve);
+                    return _d.promise();
+                }
+                , function (target) {
+                    var _d = $.Deferred();
+                    target.fadeOut(1000, _d.resolve);
+                    return _d.promise();
+                } ];
+
+            return eff[Math.floor(Math.random() * eff.length)];
+        }
+
+        function showCharacters(item) {
+            var self = this,
                     effect = this.options.effect === 'random' ?
                             $.fn.textualizer.effects[effectList[Math.floor(Math.random() * effectList.length)]] :
                             $.fn.textualizer.effects[this.options.effect],
                     dfd = $.Deferred(),
                     dfds = [];
 
-                // Iterate through all char objects
-                $.each(item.chars, function (index, char) {
-                    // If the character has not been already inserted, animate it, with a delay
-                    if (!char.inserted) {
-                        char.node
+            // Iterate through all char objects
+            $.each(item.chars, function (index, char) {
+                // If the character has not been already inserted, animate it, with a delay
+                if (!char.inserted) {
+                    char.node
                             .show()
                             .css({ 'left': char.pos.left, 'top': char.pos.top })
                             .delay(Math.random() * REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY);
 
-                        effect.call(self, char);
+                    effect.call(self, char);
 
-                        // Push the character we animate it to deferred list.
-                        dfds.push(char.node);
-                    }
-                });
+                    // Push the character we animate it to deferred list.
+                    dfds.push(char.node);
+                }
+            });
 
-                // When all characters have been showed, resolve the promise
-                $.when.apply(null, dfds).done(function () {
-                    dfd.resolve();
-                });
+            // When all characters have been showed, resolve the promise
+            $.when.apply(null, dfds).done(function () {
+                dfd.resolve();
+            });
 
-                return dfd.promise();
-            }
+            return dfd.promise();
         }
+
+
+
     });
 })(jQuery);
