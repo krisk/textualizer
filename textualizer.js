@@ -74,23 +74,37 @@
         // Effects for characters transition+animation. Customize as you please
         $.fn.textualizer.effects = {
             none: function (item) {
-                this.container.append(item.node.show());
+                this.container.append(item.domNode.show());
             }
             , fadeIn: function (item) {
-                this.container.append(item.node.fadeIn(EFFECT_DURATION))
+                this.container.append(item.domNode.fadeIn(EFFECT_DURATION))
             }
             , slideLeft: function (item) {
-                item.node
+                item.domNode
                     .appendTo(this.container)
                     .css({ 'left': -1000 })
                     .animate({ 'left': item.pos.left }, EFFECT_DURATION);
             }
             , slideTop: function (item) {
-                item.node
+                item.domNode
                     .appendTo(this.container)
                     .css({ 'top': -1000 })
                     .animate({ 'top': item.pos.top }, EFFECT_DURATION);
             }
+            /*
+            , star: function (item) {
+            var degree = Math.floor(Math.random() * 360),
+            x = Math.cos(degree) * 1400,
+            y = Math.sin(degree) * 1400,
+            pos = this.container.position();
+
+            item.domNode
+            .appendTo(this.container)
+            .hide()
+            .css({ 'top': x + pos.top, 'left': y + pos.left })
+            .animate({ 'top': item.pos.top, 'left': item.pos.left, opacity: 'show' }, EFFECT_DURATION);
+            }
+            */
         }
 
         // Copy all effects into an array ==> Makes randomization easy
@@ -128,8 +142,8 @@
 
         var Char = function () {
             this.char = null; // A character
-            this.node = null; // The span element that wraps around the character
-            this.pos = null;  // The node position
+            this.domNode = null; // The span element that wraps around the character
+            this.pos = null;  // The domNode position
             this.used = false;
             this.inserted = false;
         }
@@ -236,19 +250,19 @@
                         } else {
                             var c = new Char();
                             c.char = char;
-                            c.node = $('<span/>').text(char);
+                            c.domNode = $('<span/>').text(char);
 
-                            this.phantomContainer.append(c.node);
+                            this.phantomContainer.append(c.domNode);
                             phantomBlurbs.push(c);
                         }
                     }, this));
 
-                    // Figure out the positioning, and clone the DOM node
+                    // Figure out the positioning, and clone the DOM domNode
                     $.each(phantomBlurbs, function (index, c) {
-                        c.pos = c.node.position();
-                        c.node = c.node.clone();
+                        c.pos = c.domNode.position();
+                        c.domNode = c.domNode.clone();
 
-                        c.node.css({ 'left': c.pos.left, 'top': c.pos.top, 'position': 'absolute' });
+                        c.domNode.css({ 'left': c.pos.left, 'top': c.pos.top, 'position': 'absolute' });
                         current.chars.push(c);
                     });
 
@@ -269,7 +283,7 @@
                     $.each(this._previous.chars, function (index, prevC) {
                         var currC = current.get(prevC.char);
                         if (currC) {
-                            currC.node = prevC.node; // use the previous DOM node
+                            currC.domNode = prevC.domNode; // use the previous DOM domNode
                             currC.inserted = true;
 
                             keepList.push(currC);
@@ -277,9 +291,9 @@
                             var d = $.Deferred();
                             removeList.push(d);
 
-                            randomHideEffect(prevC.node.delay(Math.random() * REMOVE_CHARACTERS_MAX_DELAY))
+                            randomHideEffect(prevC.domNode.delay(Math.random() * REMOVE_CHARACTERS_MAX_DELAY))
                                 .done(function () {
-                                    prevC.node.remove();
+                                    prevC.domNode.remove();
                                     d.resolve();
                                 });
                         }
@@ -290,8 +304,8 @@
                         // Move charactes that are common to their new position
                         setTimeout(function () {
                             $.each(keepList, function (index, item) {
-                                item.node.animate({ 'left': item.pos.left, 'top': item.pos.top }, self.options.rearrangeDuration);
-                                dfds.push(item.node);
+                                item.domNode.animate({ 'left': item.pos.left, 'top': item.pos.top }, self.options.rearrangeDuration);
+                                dfds.push(item.domNode);
                             });
                             // When all the characters have moved to their new position, show the remaining characters
                             $.when.apply(null, dfds).done(function () {
@@ -354,15 +368,15 @@
             $.each(item.chars, function (index, char) {
                 // If the character has not been already inserted, animate it, with a delay
                 if (!char.inserted) {
-                    char.node
+                    char.domNode
                             .show()
                             .css({ 'left': char.pos.left, 'top': char.pos.top })
                             .delay(Math.random() * REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY);
 
                     effect.call(self, char);
 
-                    // Push the character we animate it to deferred list.
-                    dfds.push(char.node);
+                    // Add the DOM domNode characters that is being animated into the deferred list.
+                    dfds.push(char.domNode);
                 }
             });
 
