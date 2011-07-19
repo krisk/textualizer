@@ -285,7 +285,7 @@
                         }
                     });
 
-                    // When all characters that's arent common to the blurbs have been removed...
+                    // When all characters that aren't common to the blurbs have been removed...
                     $.when.apply(null, removeList).done(function () {
                         // Move charactes that are common to their new position
                         setTimeout(function () {
@@ -344,11 +344,11 @@
 
         function showCharacters(item) {
             var self = this,
-                    effect = this.options.effect === 'random' ?
-                            $.fn.textualizer.effects[effectList[Math.floor(Math.random() * effectList.length)]] :
-                            $.fn.textualizer.effects[this.options.effect],
-                    dfd = $.Deferred(),
-                    dfds = [];
+                effect = this.options.effect === 'random' ?
+                        $.fn.textualizer.effects[effectList[Math.floor(Math.random() * effectList.length)]] :
+                        $.fn.textualizer.effects[this.options.effect],
+                dfd = $.Deferred(),
+                dfds = [];
 
             // Iterate through all char objects
             $.each(item.chars, function (index, char) {
