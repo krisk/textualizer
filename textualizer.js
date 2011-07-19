@@ -380,7 +380,7 @@
                 }
             });
 
-            // When all characters have finished moving their position, resolve the final promise
+            // When all characters have moved to their position, resolve the final promise
             $.when.apply(null, dfds).done(function () {
                 dfd.resolve();
             });
