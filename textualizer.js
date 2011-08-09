@@ -25,6 +25,13 @@
 */
 (function ($) {
     $(document).ready(function () {
+
+        var COMMON_CHARACTER_ARRANGE_DELAY = 1000,
+            REMAINING_CHARACTERS_DELAY = 500,
+            EFFECT_DURATION = 2000,
+            REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY = 2000,
+            REMOVE_CHARACTERS_MAX_DELAY = 2000;
+            
         /**
         * Overloads:
         * 1. textualizer(data, options)
@@ -79,12 +86,6 @@
             rearrangeDuration: 1000
         };
 
-        var COMMON_CHARACTER_ARRANGE_DELAY = 1000,
-            REMAINING_CHARACTERS_DELAY = 500,
-            EFFECT_DURATION = 2000,
-            REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY = 2000,
-            REMOVE_CHARACTERS_MAX_DELAY = 2000;
-
         // Effects for characters transition+animation. Customize as you please
         $.fn.textualizer.effects = {
             none: function (item) {
@@ -130,11 +131,11 @@
         });
 
         var Blurb = function () {
-            this.str;  // The text string
+            this.str;        // The text string
             this.chars = []; // Array of char objects
         }
         Blurb.prototype = {
-            // Loops through chars, and find the first char whose character matches c, and hasn't been already used.
+            // Loops through <chars>, and find the first char whose character matches c, and hasn't been already used.
             get: function (c) {
                 for (var i = 0, len = this.chars.length; i < len; i++) {
                     var l = this.chars[i];
@@ -145,7 +146,7 @@
                 }
                 return null;
             }
-            // Resets ever character in chars
+            // Resets ever character in <chars>
             , reset: function () {
                 $.each(this.chars, function (index, char) {
                     char.inserted = false;
@@ -154,12 +155,13 @@
             }
         }
 
-        var Char = function () {
-            this.char = null; // A character
-            this.domNode = null; // The span element that wraps around the character
-            this.pos = null;  // The domNode position
+        var Character = function () {
+            this.char = null;       // A character
+            this.domNode = null;    // The span element that wraps around the character
+            this.pos = null;        // The domNode position
             this.used = false;
             this.inserted = false;
+            this.visited = false;
         }
 
         var Textualizer = function (element, data, options) {
@@ -212,7 +214,7 @@
                     if (self._pause) {
                         return;
                     }
-                    // _rotate returns a promise, which completes when a blurb has finished animating.  When that 
+                    // <_rotate> returns a promise, which completes when a blurb has finished animating.  When that 
                     // promise is fulfilled, transition to the next blurb.
                     self._rotate(i)
                         .done(function () {
@@ -248,8 +250,8 @@
                 var dfd = $.Deferred(),
                     current = this.blurbs[index];
 
-                // If this is the first time the text is encountered, each character in the text is wrapped in
-                // a span and appended to an invisible container where the positioning is calculated.
+                // If this is the first time the blurb is encountered, each character in the blurb is wrapped in
+                // a span and appended to an invisible container, thus we're able to calculate the character's position
                 if (!current) {
                     var phantomBlurbs = [];
 
@@ -262,7 +264,7 @@
                         if (char === '') {
                             this.phantomContainer.append(' ');
                         } else {
-                            var c = new Char();
+                            var c = new Character();
                             c.char = char;
                             c.domNode = $('<span/>').text(char);
 
@@ -296,6 +298,7 @@
 
                     $.each(this._previous.chars, function (index, prevC) {
                         var currC = current.get(prevC.char);
+
                         if (currC) {
                             currC.domNode = prevC.domNode; // use the previous DOM domNode
                             currC.inserted = true;
@@ -401,8 +404,6 @@
 
             return dfd.promise();
         }
-
-
 
     });
 })(jQuery);
