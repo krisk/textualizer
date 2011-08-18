@@ -13,9 +13,75 @@ h1 {
 	margin: 0 auto;
 	width: 700px;
 }
-#textualizer_container {
+#txtlzr {
 	margin-top: 20px;
-    font-size: 40px;
+    font-size: 30px;
     width: 700px;
-    height: 300px;
+    height: 200px;
+}
+pre {
+	border: 1px solid black;
+	border-color: #BBB #DDD #DDD #BBB;
+	line-height: 1.5;
+	background: white;
+	overflow: auto;
+}
+/* end of page css - below is for the code highlighter */
+
+.javascript .comment {
+	color : green;
+}
+
+.javascript .string {
+	color : teal;
+}
+
+.javascript .keywords {
+	color : navy;
+}
+
+.javascript .global {
+	color : blue;
+}
+
+.javascript .brackets {
+	color : navy;
+}
+
+.css .comment {
+	color : gray;
+}
+
+.css .properties {
+	color : navy;
+}
+
+.css .selectors {
+	color : maroon;
+	font-weight : bold;
+}
+
+.css .units {
+	color :red;
+}
+
+.css .urls {
+	color :green;
+}
+
+.html .tag {
+	color : purple;
+}
+
+.html .comment {
+	color : gray;
+	font-style: italic;
+}
+
+.html .string {
+	color : navy;
+}
+
+.html .doctype {
+	color : teal;
 }

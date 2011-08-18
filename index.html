@@ -3,15 +3,48 @@
   <head>
     <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
     <script src="https://raw.github.com/krisk/textualizer/master/textualizer.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/danwrong/code-highlighter/master/code_highlighter.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/danwrong/code-highlighter/master/javascript.js"></script>
+<script type="text/javascript" src="https://raw.github.com/danwrong/code-highlighter/master/html.js"></script>
+  
     <link href="main.css" rel="stylesheet" type="text/css"></style>
   </head>
   <body>
       <a href="http://github.com/krisk/textualizer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
       <div id="container">
-        <h1>textualizer</h1>      
-        <div id="textualizer_container">
+        <h1>textualizer</h1><span>by <a href="#">Kirollos Risk</a></span></h1>
+        <div id="txtlzr">
         </div>
+
+        HTML:
+
+        <pre><code class="html">
+  &lt;div id=&quot;txtlzr&quot; /&gt;
+          </code></pre>
+            
+        Javascipt:
+
+        <pre><code class="javascript">
+  var list = ['Textualizer is a jQuery plug-in that allows you to transition 
+              through blurbs of text. '
+            , 'When transitioning to a new blurb, any character that is 
+               common to the next blurb is kept on the screen, and moved to 
+               its new position.'
+            , 'Textualize: verb - to put into text, set down as concrete and 
+               unchanging.  Use Textualizer to transition through blurbs of text.'
+            , 'Blurb: noun - a short summary or some words of praise 
+               accompanying a creative work.  A promotional description.'];
+
+  var txt = $('#txtlzr');
+
+  var options = {
+    duration: 3000 // 3 secs - time each blurb will remain on screen
+  }
+
+  txt.textualizer(list, options);
+  txt.textualizer('start');
+          </code></pre>
     </div>
 
   </body>
@@ -21,13 +54,12 @@
           var list = ['Textualizer is a jQuery plug-in that allows you to transition through blurbs of text. '
                     ,'When transitioning to a new blurb, any character that is common to the next blurb is kept on the screen, and moved to its new position.'
                     , 'Textualize: verb - to put into text, set down as concrete and unchanging.  Use Textualizer to transition through blurbs of text.'
-                    , 'Blurb: noun - a short summary or some words of praise accompanying a creative work.  A promotional description.'
-                    , 'Back to the beginning...'];
+                    , 'Blurb: noun - a short summary or some words of praise accompanying a creative work.  A promotional description.'];
 
-          var s = $('#textualizer_container');
+          var txt = $('#txtlzr');
 
-          s.textualizer(list, { duration: 3000 });
-          s.textualizer('start');
+          txt.textualizer(list, { duration: 3000 });
+          txt.textualizer('start');
     })
   </script>
 </html>
