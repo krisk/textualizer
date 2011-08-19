@@ -1,0 +1,69 @@
+html {
+    
+}
+body {
+	margin-top: 1.0em;
+	background-color: #ffffff;
+	background: url("../images/bg.png") repeat scroll 0 0 transparent;
+    color: #333333;
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 16px;
+}
+h1, h2, h3 {
+	font-family: 'Amaranth',sans-serif;
+}
+h1 {
+    font-size: 100px;
+    margin: 0;
+    padding: 0;
+    text-shadow: 0 1px 0 #FFFFFF;
+}
+h2 {
+	font-size: 28px;
+}
+pre {
+    font-size: 14px;
+    line-height: 18px;
+    text-shadow: none;
+}
+a {
+    color: #333333;
+}
+a:hover {
+    color: #000000;
+}
+#container {
+	margin: 0 auto;
+	width: 800px;
+}
+#txtlzr {
+	margin-top: 20px;
+    font-size: 30px;
+    width: 700px;
+    height: 120px;
+	font-family: 'Amaranth',sans-serif;
+}
+#download a {
+    background: none repeat scroll 0 0 #56BA4A;
+    border: 3px solid #59A24F;
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    color: #FFFFFF;
+    display: inline-block;
+    font-family: 'Amaranth',sans-serif;
+    font-size: 24px;
+    margin: 10px 20px 0 0;
+    padding: 10px 30px;
+    text-decoration: none;
+    text-shadow: 1px 1px 1px #59A24F;
+}
+#download a:hover {
+    background: none repeat scroll 0 0 #2F8325;
+    box-shadow: none;
+}
+#contact img {
+    border: 3px solid #EEEEEE;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+    float: left;
+    margin: 0 16px 50px 0;
+}

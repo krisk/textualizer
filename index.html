@@ -1,58 +1,80 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script type="text/javascript" src="javascript/prettify.js"></script>
     <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
-    <script src="https://raw.github.com/krisk/textualizer/master/textualizer.js"></script>
+    <script src="javascript/textualizer.js"></script>
+    <link href="http://fonts.googleapis.com/css?family=Amaranth:400,700" rel="stylesheet" type="text/css">
+    <!--
     <script type="text/javascript" src="https://raw.github.com/danwrong/code-highlighter/master/code_highlighter.js"></script>
     <script type="text/javascript" src="https://raw.github.com/danwrong/code-highlighter/master/javascript.js"></script>
-<script type="text/javascript" src="https://raw.github.com/danwrong/code-highlighter/master/html.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/danwrong/code-highlighter/master/html.js"></script>
+    -->
   
-    <link href="main.css" rel="stylesheet" type="text/css"></style>
+    <link href="style/prettify.css" type="text/css" rel="stylesheet" />
+    <link href="style/main.css" rel="stylesheet" type="text/css"></style>
   </head>
   <body>
       <a href="http://github.com/krisk/textualizer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-
       <div id="container">
-        <h1>textualizer</h1><span>by <a href="#">Kirollos Risk</a></span></h1>
+        <h1>textualizer</h1>
         <div id="txtlzr">
         </div>
 
-        HTML:
+        <div id="download">
+          <a href="javascript/textualizer.js">textualizer.js</a>
+          <a href="javascript/textualizer.min.js">textualizer.min.js</a>
+        </div>
+        <h2>Usage</h2>
+          <pre class="prettyprint">
+  var list = ['first blurb', 'second blurb', 'third blurb'];  // list of blurbs
 
-        <pre><code class="html">
-  &lt;!-- This will serve as the container --&gt;
-  &lt;div id=&quot;txtlzr&quot; /&gt;
-          </code></pre>
-            
-        Code:
-
-        <pre><code class="javascript">
-  var list = ['Textualizer is a jQuery plug-in that allows you to transition 
-              through blurbs of text. '
-            , 'When transitioning to a new blurb, any character that is 
-               common to the next blurb is kept on the screen, and moved to 
-               its new position.'
-            , 'Textualize: verb - to put into text, set down as concrete and 
-               unchanging.  Use Textualizer to transition through blurbs of text.'
-            , 'Blurb: noun - a short summary or some words of praise 
-               accompanying a creative work.  A promotional description.'];
-
-  var txt = $('#txtlzr');
+  var txt = $('#txtlzr');  // The container in which to render the list
 
   var options = {
-    duration: 3000 // 3 secs - time each blurb will remain on screen
+    duration: 1000,          // Time (ms) each blurb will remain on screen
+    rearrangeDuration: 1000, // Time (ms) a character takes to reach its position
+    effect: 'random'         // Animation effect the characters use to appear
   }
 
-  txt.textualizer(list, options);
-  txt.textualizer('start');
-          </code></pre>
-    </div>
+  txt.textualizer(list, options); // textualize it!
+  txt.textualizer('start'); // start</pre>
+      <h3>Animation effects</h3>
+      <p>
+        Textualizer currently has the following effects: <code>fadeIn</code>, <code>slideLeft</code>, <code>slideTop</code>, and <code>random</code>.  You can choose which effect to use by setting the <code>effect</code> option.
+      </p>
+      <h3>Pause, stopping, destroying</h3>
+      <table>
+        <tbody>
+          <tr>
+            <td style="vertical-align: sub"><code>textualizer('pause')</code></td>
+            <td>Pauses all animation at the next blurb. That is, once all characters have finished moving to their position, the animation will pause.</td>
+          </tr>
+          <tr>
+            <td><code>textualizer('stop')</code></td>
+            <td>Stops the animation, and removes the blurbs</td>
+          </tr>
+          <tr>
+            <td><code>textualizer('destroy')</code></td>
+            <td>Destroys the textualizer instance, as well as removing all blurbs.</td>
+          </tr>
+        </tbody>
+      </table>
+    <h2>Supported browsers</h2>
+    <img src="images/browsers.png">
+    <h2>Contact</h2>
+    <p id="contact">
+      <img width="57" height="57" src="http://www.gravatar.com/avatar/4ae8dc54def0eb337f21fe40fa8972db?s=80">
+      If you encounter any problems, please use the <a href="https://github.com/krisk/textualizer/issues">GitHub issue tracker</a>.<br>
 
+      If you like textualizer and use it in the wild let me know.
+    </p>
   </body>
-
   <script type="text/javascript">
     $(function() {
-          var list = ['Textualizer is a jQuery plug-in that allows you to transition through blurbs of text. '
+          prettyPrint();
+
+          var list = ['Textualizer is a jQuery plug-in that allows you to transition through blurbs of text. Just like this...'
                     ,'When transitioning to a new blurb, any character that is common to the next blurb is kept on the screen, and moved to its new position.'
                     , 'Textualize: verb - to put into text, set down as concrete and unchanging.  Use Textualizer to transition through blurbs of text.'
                     , 'Blurb: noun - a short summary or some words of praise accompanying a creative work.  A promotional description.'];
