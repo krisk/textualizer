@@ -1,5 +1,5 @@
 /**
-    Textualizer v2.1.0
+    Textualizer v2.3.0
     
     Dual licensed under the MIT or GPL Version 2 licenses.
 
