@@ -60,6 +60,9 @@ a:hover {
     background: none repeat scroll 0 0 #2F8325;
     box-shadow: none;
 }
+#download a span {
+    font-size: 15px;
+}
 #contact img {
     border: 3px solid #EEEEEE;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
