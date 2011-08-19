@@ -106,20 +106,6 @@
                     .css({ 'top': -1000 })
                     .animate({ 'top': item.pos.top }, EFFECT_DURATION);
             }
-            /*
-            , star: function (item) {
-            var degree = Math.floor(Math.random() * 360),
-            x = Math.cos(degree) * 1400,
-            y = Math.sin(degree) * 1400,
-            pos = this.container.position();
-
-            item.domNode
-            .appendTo(this.container)
-            .hide()
-            .css({ 'top': x + pos.top, 'left': y + pos.left })
-            .animate({ 'top': item.pos.top, 'left': item.pos.left, opacity: 'show' }, EFFECT_DURATION);
-            }
-            */
         }
 
         // Copy all effects into an array ==> Makes randomization easy
@@ -131,15 +117,15 @@
         });
 
         var Blurb = function () {
-            this.str;        // The text string
-            this.chars = []; // Array of char objects
+            this.str = '';        // The text string
+            this.chars = []; // Array of ch objects
         }
         Blurb.prototype = {
-            // Loops through <chars>, and find the first char whose character matches c, and hasn't been already used.
+            // Loops through <chars>, and find the first ch whose character matches c, and hasn't been already used.
             get: function (c) {
                 for (var i = 0, len = this.chars.length; i < len; i++) {
                     var l = this.chars[i];
-                    if (l.char === c && !l.used) {
+                    if (l.ch === c && !l.used) {
                         l.used = true;  // Mark as used.  
                         return l;
                     }
@@ -148,15 +134,15 @@
             }
             // Resets ever character in <chars>
             , reset: function () {
-                $.each(this.chars, function (index, char) {
-                    char.inserted = false;
-                    char.used = false;
+                $.each(this.chars, function (index, ch) {
+                    ch.inserted = false;
+                    ch.used = false;
                 });
             }
         }
 
         var Character = function () {
-            this.char = null;       // A character
+            this.ch = null;       // A character
             this.domNode = null;    // The span element that wraps around the character
             this.pos = null;        // The domNode position
             this.used = false;
@@ -279,13 +265,13 @@
                     this.blurbs.push(current);
 
                     // Add all chars first to the phantom container. Let the browser deal with the formatting.
-                    $.each(current.str, $.proxy(function (index, char) {
-                        if (char === '') {
+                    $.each(current.str, $.proxy(function (index, ch) {
+                        if (ch === '') {
                             this.phantomContainer.append(' ');
                         } else {
                             var c = new Character();
-                            c.char = char;
-                            c.domNode = $('<span/>').text(char);
+                            c.ch = ch;
+                            c.domNode = $('<span/>').text(ch);
 
                             this.phantomContainer.append(c.domNode);
                             phantomBlurbs.push(c);
@@ -316,7 +302,7 @@
                     var randomHideEffect = getRandomHideEffect.call(this);
 
                     $.each(this._previous.chars, function (index, prevC) {
-                        var currC = current.get(prevC.char);
+                        var currC = current.get(prevC.ch);
 
                         if (currC) {
                             currC.domNode = prevC.domNode; // use the previous DOM domNode
@@ -400,19 +386,19 @@
                 dfd = $.Deferred(),
                 dfds = [];
 
-            // Iterate through all char objects
-            $.each(item.chars, function (index, char) {
+            // Iterate through all ch objects
+            $.each(item.chars, function (index, ch) {
                 // If the character has not been already inserted, animate it, with a delay
-                if (!char.inserted) {
-                    char.domNode
+                if (!ch.inserted) {
+                    ch.domNode
                             .show()
-                            .css({ 'left': char.pos.left, 'top': char.pos.top })
+                            .css({ 'left': ch.pos.left, 'top': ch.pos.top })
                             .delay(Math.random() * REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY);
 
-                    effect.call(self, char);
+                    effect.call(self, ch);
 
                     // Add the DOM domNode characters that is being animated into the deferred list.
-                    dfds.push(char.domNode);
+                    dfds.push(ch.domNode);
                 }
             });
 
