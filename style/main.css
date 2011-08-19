@@ -73,8 +73,15 @@ a:hover {
 #api li {
     padding: 10px 0;
 }
-#api li:not(:last-child) {
+#api li:first-child {
+    padding-top: 0;
+}
+#api li {
     border-bottom: 1px solid #AEAEAE;    
+}
+#api li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;  
 }
 #api p {
    margin: 0;
