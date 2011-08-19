@@ -9,7 +9,7 @@ body {
     font-family: Helvetica,Arial,sans-serif;
     font-size: 16px;
 }
-h1, h2, h3 {
+h1, h2, h3, #txtlzr {
 	font-family: 'Amaranth',sans-serif;
 }
 h1 {
@@ -41,7 +41,6 @@ a:hover {
     font-size: 30px;
     width: 700px;
     height: 120px;
-	font-family: 'Amaranth',sans-serif;
 }
 #download a {
     background: none repeat scroll 0 0 #56BA4A;
@@ -66,4 +65,18 @@ a:hover {
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
     float: left;
     margin: 0 16px 50px 0;
+}
+#api {
+    list-style: none;
+    padding: 0;        
+}
+#api li {
+    padding: 10px 0;
+}
+#api li:not(:last-child) {
+    border-bottom: 1px solid #AEAEAE;    
+}
+#api p {
+   margin: 0;
+   margin-top: 5px;
 }
