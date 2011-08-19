@@ -32,6 +32,9 @@ a {
 a:hover {
     color: #000000;
 }
+p {
+    line-height: 1.4em;
+}
 #container {
 	margin: 0 auto;
 	width: 800px;
