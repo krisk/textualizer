@@ -90,3 +90,9 @@ a:hover {
    margin: 0;
    margin-top: 5px;
 }
+#browsers {
+    padding-left: 20px;
+}
+#browsers li {
+    line-height: 1.4em;
+}
