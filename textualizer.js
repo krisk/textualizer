@@ -167,19 +167,34 @@
         var Textualizer = function (element, data, options) {
             this.options = options;
 
+            // Used for initial positioning calculation
             this._parent = element.parent();
+
+            // Clone the target element, and remove the id attribute (if it has one)
+            // Why remove the id? Cuz when we clone an element, the id is also copied.  That's a very bad thing,
+            var clone = element.clone().removeAttr('id').appendTo(document.body);
+
+            // Copy all the styles.  This is especially necessary if the clone was being styled by id in a stylesheet)
+            var styles = window.getComputedStyle(element[0], null);
+            $.each(styles, function(key, value) {
+                clone.css(value, styles.getPropertyValue(value));
+            });
+
+            // Note that the clone needs to be visible so we can do the proper calculation
+            // of the position of every character.  Ergo, move the clone outside of the window's 
+            // visible area.
+            clone.css({ position: 'absolute', top: '-1000px' });
+                
+            this.phantomContainer = $('<div />')
+                .css({ 'position': 'relative', 'visibility': 'hidden' })
+                .appendTo(clone);
 
             // Contains transitioning text
             this.container = $('<div />')
                 .css('position', 'relative')
                 .appendTo(element);
 
-            // Used for initial positioning calculation
-            this.phantomContainer = $('<div />')
-                .css({ 'position': 'relative', 'visibility': 'hidden' })
-                .appendTo(element.clone().appendTo(document.body))
-
-            // Holds the previous text
+            // Holds the previous blurb
             this._previous = null;
 
             this._position = this._parent.position();
