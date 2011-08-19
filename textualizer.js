@@ -1,5 +1,5 @@
 /**
-    Textualizer v2.1.0
+    Textualizer v2.3.0
     
     Dual licensed under the MIT or GPL Version 2 licenses.
 
@@ -189,7 +189,11 @@
                 .css({ 'position': 'relative', 'visibility': 'hidden' })
                 .appendTo(clone);
 
-            // Contains transitioning text
+            // Make sure any animating character disappear when outside the boundaries of 
+            // the element
+            element.css('overflow', 'hidden');
+
+            // Contains transitioning text           
             this.container = $('<div />')
                 .css('position', 'relative')
                 .appendTo(element);
