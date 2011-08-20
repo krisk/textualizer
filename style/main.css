@@ -45,8 +45,11 @@ p {
     width: 700px;
     height: 120px;
 }
+#download  {
+    margin-top: 10px;
+}
 #download a {
-    background: none repeat scroll 0 0 #56BA4A;
+    background: url("../images/download.png") no-repeat scroll 15px 12px #56BA4A;
     border: 3px solid #59A24F;
     border-radius: 5px 5px 5px 5px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
@@ -54,13 +57,13 @@ p {
     display: inline-block;
     font-family: 'Amaranth',sans-serif;
     font-size: 24px;
-    margin: 10px 20px 0 0;
-    padding: 10px 30px;
+    margin-right: 20px;
+    padding: 10px 15px 10px 50px;
     text-decoration: none;
     text-shadow: 1px 1px 1px #59A24F;
 }
 #download a:hover {
-    background: none repeat scroll 0 0 #2F8325;
+    background-color: #2F8325;
     box-shadow: none;
 }
 #download a span {
