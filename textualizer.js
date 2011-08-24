@@ -1,27 +1,27 @@
 /**
-    Textualizer v2.3.0
+Textualizer v2.3.0
     
-    Dual licensed under the MIT or GPL Version 2 licenses.
+Dual licensed under the MIT or GPL Version 2 licenses.
 
-    Copyright (c) 2011 Kirollos Risk
+Copyright (c) 2011 Kirollos Risk
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-    THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 */
 (function ($) {
     $(document).ready(function () {
@@ -31,7 +31,7 @@
             EFFECT_DURATION = 2000,
             REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY = 2000,
             REMOVE_CHARACTERS_MAX_DELAY = 2000;
-            
+
         /**
         * Overloads:
         * 1. textualizer(data, options)
@@ -164,12 +164,12 @@
             var style;
             if (window.getComputedStyle) {
                 styles = window.getComputedStyle(element[0], null);
-                $.each(styles, function(key, value) {
+                $.each(styles, function (key, value) {
                     clone.css(value, styles.getPropertyValue(value));
                 });
             } else {
                 styles = element[0].currentStyle;
-                $.each(styles, function(key, value) {
+                $.each(styles, function (key, value) {
                     clone.css(key, value);
                 });
             }
@@ -178,7 +178,7 @@
             // of the position of every character.  Ergo, move the clone outside of the window's 
             // visible area.
             clone.css({ position: 'absolute', top: '-1000px' });
-                
+
             this.phantomContainer = $('<div />')
                 .css({ 'position': 'relative', 'visibility': 'hidden' })
                 .appendTo(clone);
@@ -266,25 +266,27 @@
                 // If this is the first time the blurb is encountered, each character in the blurb is wrapped in
                 // a span and appended to an invisible container, thus we're able to calculate the character's position
                 if (!current) {
-                    var phantomBlurbs = [];
+                    var phantomBlurbs = [], i, len, ch, c;
 
                     current = new Blurb();
                     current.str = this.list[index];
                     this.blurbs.push(current);
 
                     // Add all chars first to the phantom container. Let the browser deal with the formatting.
-                    $.each(current.str.split(''), $.proxy(function (index, ch) {
+                    for (i = 0, len = current.str.length; i < len; i++) {
+                        ch = current.str.charAt(i);
+
                         if (ch === '') {
                             this.phantomContainer.append(' ');
                         } else {
-                            var c = new Character();
+                            c = new Character();
                             c.ch = ch;
                             c.domNode = $('<span/>').text(ch);
 
                             this.phantomContainer.append(c.domNode);
                             phantomBlurbs.push(c);
                         }
-                    }, this));
+                    }
 
                     // Figure out the positioning, and clone the DOM domNode
                     $.each(phantomBlurbs, function (index, c) {
