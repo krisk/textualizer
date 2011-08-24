@@ -161,10 +161,18 @@
             var clone = element.clone().removeAttr('id').appendTo(document.body);
 
             // Copy all the styles.  This is especially necessary if the clone was being styled by id in a stylesheet)
-            var styles = window.getComputedStyle(element[0], null);
-            $.each(styles, function(key, value) {
-                clone.css(value, styles.getPropertyValue(value));
-            });
+            var style;
+            if (window.getComputedStyle) {
+                styles = window.getComputedStyle(element[0], null);
+                $.each(styles, function(key, value) {
+                    clone.css(value, styles.getPropertyValue(value));
+                });
+            } else {
+                styles = element[0].currentStyle;
+                $.each(styles, function(key, value) {
+                    clone.css(key, value);
+                });
+            }
 
             // Note that the clone needs to be visible so we can do the proper calculation
             // of the position of every character.  Ergo, move the clone outside of the window's 
@@ -265,7 +273,7 @@
                     this.blurbs.push(current);
 
                     // Add all chars first to the phantom container. Let the browser deal with the formatting.
-                    $.each(current.str, $.proxy(function (index, ch) {
+                    $.each(current.str.split(''), $.proxy(function (index, ch) {
                         if (ch === '') {
                             this.phantomContainer.append(' ');
                         } else {
