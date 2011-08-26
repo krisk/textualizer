@@ -149,6 +149,21 @@ THE SOFTWARE.
             this.inserted = false;
             this.visited = false;
         }
+    
+        function copyStyle(fromElem, toElem) {
+            var style;
+            if (window.getComputedStyle) {
+                styles = window.getComputedStyle(fromElem[0], null);
+                $.each(styles, function (key, value) {
+                    toElem.css(value, styles.getPropertyValue(value));
+                });
+            } else {
+                styles = fromElem[0].currentStyle;
+                $.each(styles, function (key, value) {
+                    toElem.css(key, value);
+                });
+            }
+        }
 
         var Textualizer = function (element, data, options) {
             this.options = options;
@@ -161,18 +176,7 @@ THE SOFTWARE.
             var clone = element.clone().removeAttr('id').appendTo(document.body);
 
             // Copy all the styles.  This is especially necessary if the clone was being styled by id in a stylesheet)
-            var style;
-            if (window.getComputedStyle) {
-                styles = window.getComputedStyle(element[0], null);
-                $.each(styles, function (key, value) {
-                    clone.css(value, styles.getPropertyValue(value));
-                });
-            } else {
-                styles = element[0].currentStyle;
-                $.each(styles, function (key, value) {
-                    clone.css(key, value);
-                });
-            }
+            copyStyle(element, clone);
 
             // Note that the clone needs to be visible so we can do the proper calculation
             // of the position of every character.  Ergo, move the clone outside of the window's 
