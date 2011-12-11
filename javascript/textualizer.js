@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 (function ($) {
-    $(document).ready(function () {
+    $(function () {
 
         var COMMON_CHARACTER_ARRANGE_DELAY = 1000,
             REMAINING_CHARACTERS_DELAY = 500,
