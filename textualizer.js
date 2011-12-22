@@ -210,9 +210,9 @@ THE SOFTWARE.
                 // Holds the previous blurb
                 this._previous = null;
 
-                this._position = this._parent.position();
-                this._position.bottom = this._position.top + this._parent.height();
-
+                this._position = {}
+                this._position.bottom = element.height();
+                
                 this.blurbs = [];
 
                 if (data && data instanceof Array) {
