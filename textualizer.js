@@ -430,7 +430,6 @@ THE SOFTWARE.
                     }, Math.random() * REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY);
 
                     animationDfdList.push(animationDfd);
-                    // Add the DOM domNode characters that is being animated into the deferred list.
                 }
             });
 
