@@ -421,7 +421,7 @@ THE SOFTWARE.
                     ch.domNode.css({
                         'left': ch.pos.left,
                         'top': ch.pos.top
-                    })
+                    });
 
                     var animationDfd = $.Deferred();
 
