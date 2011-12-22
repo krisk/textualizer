@@ -402,7 +402,7 @@ THE SOFTWARE.
             }, function (target) {
                 var d = $.Deferred();
                 target.fadeOut(1000, d.resolve);
-                return_d.promise();
+                return d.promise();
             }];
 
             return eff[Math.floor(Math.random() * eff.length)];
