@@ -177,9 +177,6 @@ THE SOFTWARE.
         var Textualizer = function (element, data, options) {
                 this.options = options;
 
-                // Used for initial positioning calculation
-                this._parent = element.parent();
-
                 // Clone the target element, and remove the id attribute (if it has one)
                 // Why remove the id? Cuz when we clone an element, the id is also copied.  That's a very bad thing,
                 var clone = element.clone().removeAttr('id').appendTo(document.body);
@@ -203,6 +200,8 @@ THE SOFTWARE.
                 // Make sure any animating character disappear when outside the boundaries of 
                 // the element
                 element.css('overflow', 'hidden');
+
+                this.elementHeight = element.height();
 
                 // Contains transitioning text           
                 this.container = $('<div />').css('position', 'relative').appendTo(element);
@@ -304,11 +303,19 @@ THE SOFTWARE.
                             phantomBlurbs.push(c);
                         }
                     }
+                    
+                    // If options.centered is true, then we need to center the text.
+                    // This cannot be done solely with CSS, because of the absolutely positioned characters
+                    // within a relative container.  Ergo, to achieve a vertically-aligned look, do 
+                    // the following simple math:
+                    var height = this.options.centered ? (this.elementHeight - this.phantomContainer.height()) / 2 : 0;
 
                     // Figure out the positioning, and clone the DOM domNode
                     $.each(phantomBlurbs, function (index, c) {
                         c.pos = c.domNode.position();
                         c.domNode = c.domNode.clone();
+
+                        c.pos.top += height;
 
                         c.domNode.css({
                             'left': c.pos.left,
