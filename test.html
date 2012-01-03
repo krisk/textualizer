@@ -1,47 +1,39 @@
-<!DOCTYPE html>
-<html>
-  <head>
+<!DOCTYPE html> 
+<html> 
+  <head> 
     <title>Textualizer example</title>
-    <script src="http://code.jquery.com/jquery.min.js"></script>
-    <script src="textualizer.js"></script>
- 
+    <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script> 
+    <script src="textualizer.js"></script> 
+  
     <style type="text/css">
-        #container
-        {
-            height: 100%;
-            width: 100%;
-            margin: 0 auto;
-            /*text-align: center;*/
-        }
         #txtlzr
         {
             font-size: 40px;
             width: 700px;
-            margin: 0 auto;
+            height: 300px;
+            margin-left: 100px;
+            margin-top: 50px;
             border: 1px solid red;
-            font-size: 40px;
-            height: 700px;
         }
     </style>
-  </head>
-  <body>
-        <div id="container">
-          <div id="txtlzr">
-          </div>
-        </div>
-  </body>
+  </head> 
+  <body> 
+      <div id="container"> 
+        <div id="txtlzr">
+        	<p>Textualizer is a jQuery plug-in that allows you to transition through blurbs of text. </p>
+			<p>When transitioning to a new blurb, any character that is common to the next blurb is kept on the screen, and moved to its new position.</p>
+			<p>Textualize: verb - to put into text, set down as concrete and unchanging.  Use Textualizer to transition through blurbs of text.</p>
+			<p>Blurb: noun - a short summary or some words of praise accompanying a creative work.  A promotional description.</p>
+        </div> 
+    </div> 
+ 
+  </body> 
 
-  <script type="text/javascript">
+  <script type="text/javascript"> 
     $(function() {
-          var list = ['Textualizer is a jQuery plug-in that allows you to transition through blurbs of text. '
-                    ,'When transitioning to a new blurb, any character that is common to the next blurb is kept on the screen, and moved to its new position.'
-                    , 'Textualize: verb - to put into text, set down as concrete and unchanging.  Use Textualizer to transition through blurbs of text.'
-                    , 'Blurb: noun - a short summary or some words of praise accompanying a creative work.  A promotional description.'];
- 
-          var txt = $('#txtlzr');
- 
-          txt.textualizer(list, { centered: true });
+          var txt = $('#txtlzr'); 
+          txt.textualizer();
           txt.textualizer('start');
     })
-  </script>
+  </script> 
 </html>
