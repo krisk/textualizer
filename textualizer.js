@@ -62,7 +62,7 @@ THE SOFTWARE.
                         options = args[1];
                     }
 
-                    if (data.length == 0) {
+                    if (data.length === 0) {
                         ele.find("p").each(function () {
                             data.push($(this).text());
                         });
