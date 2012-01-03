@@ -46,7 +46,7 @@ THE SOFTWARE.
          */
         $.fn.textualizer = function (data, options) {
             var args = arguments;
-			
+
             function get(ele) {
                 var txtlzr = ele.data('textualizer');
                 if (!txtlzr) {
@@ -62,15 +62,15 @@ THE SOFTWARE.
                         options = args[1];
                     }
 
-					if (data.length==0) {
-						ele.find("p").each(function() {
-							data.push($(this).text());
-						});
-					} else {
-                    throw 'textualizer: invalid argument(s)';
-					}
+                    if (data.length == 0) {
+                        ele.find("p").each(function () {
+                            data.push($(this).text());
+                        });
+                    } else {
+                        throw 'textualizer: invalid argument(s)';
+                    }
 
-					ele.html("");
+                    ele.html("");
 
                     options = $.extend({}, $.fn.textualizer.defaults, options);
                     txtlzr = new Textualizer(ele, data, options);
@@ -147,9 +147,8 @@ THE SOFTWARE.
                     }
                 }
                 return null;
-            }
+            },
             // Resets ever character in <chars>
-            ,
             reset: function () {
                 $.each(this.chars, function (index, ch) {
                     ch.inserted = false;
@@ -219,7 +218,7 @@ THE SOFTWARE.
 
                 this._position = {}
                 this._position.bottom = element.height();
-                
+
                 this.blurbs = [];
 
                 if (data && data instanceof Array) {
@@ -245,8 +244,6 @@ THE SOFTWARE.
                 this._pause = false;
 
                 // Begin transitioning through the items
-
-
                 function rotate(i) {
                     if (self._pause) {
                         return;
@@ -311,7 +308,7 @@ THE SOFTWARE.
                             phantomBlurbs.push(c);
                         }
                     }
-                    
+
                     // If options.centered is true, then we need to center the text.
                     // This cannot be done solely with CSS, because of the absolutely positioned characters
                     // within a relative container.  Ergo, to achieve a vertically-aligned look, do 
@@ -407,6 +404,7 @@ THE SOFTWARE.
         function getRandomHideEffect() {
             var self = this;
             var eff = [
+
             function (target) {
                 var d = $.Deferred();
                 target.animate({
