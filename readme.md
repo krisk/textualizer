@@ -5,6 +5,12 @@ See it in action: http://krisk.github.com/textualizer/
 Usage
 -----
 
+Example 0 - Simplest usage with <p> inside container
+
+	var txtlizer = $('#container');
+	txtlizer.textualizer();
+	txtlizer.textualizer('start');	
+
 Example 1 - Simple usage
 
 	var list = ['This should provide'

@@ -19,7 +19,11 @@
   </head> 
   <body> 
       <div id="container"> 
-        <div id="txtlzr"> 
+        <div id="txtlzr">
+        	<p>Textualizer is a jQuery plug-in that allows you to transition through blurbs of text. </p>
+			<p>When transitioning to a new blurb, any character that is common to the next blurb is kept on the screen, and moved to its new position.</p>
+			<p>Textualize: verb - to put into text, set down as concrete and unchanging.  Use Textualizer to transition through blurbs of text.</p>
+			<p>Blurb: noun - a short summary or some words of praise accompanying a creative work.  A promotional description.</p>
         </div> 
     </div> 
  
@@ -27,14 +31,8 @@
 
   <script type="text/javascript"> 
     $(function() {
-          var list = ['Textualizer is a jQuery plug-in that allows you to transition through blurbs of text. '
-                    ,'When transitioning to a new blurb, any character that is common to the next blurb is kept on the screen, and moved to its new position.'
-                    , 'Textualize: verb - to put into text, set down as concrete and unchanging.  Use Textualizer to transition through blurbs of text.'
-                    , 'Blurb: noun - a short summary or some words of praise accompanying a creative work.  A promotional description.'];
- 
-          var txt = $('#txtlzr');
- 
-          txt.textualizer(list);
+          var txt = $('#txtlzr'); 
+          txt.textualizer();
           txt.textualizer('start');
     })
   </script> 
