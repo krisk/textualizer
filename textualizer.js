@@ -60,8 +60,6 @@ THE SOFTWARE.
                     } else if (args.length === 2) {
                         data = args[0];
                         options = args[1];
-                    } else {
-                        throw 'textualizer: invalid argument(s)';
                     }
 
                     if (data.length === 0) {
