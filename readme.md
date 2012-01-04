@@ -5,13 +5,13 @@ See it in action: http://krisk.github.com/textualizer/
 Usage
 -----
 
-Example 0 - Simplest usage with "<p>" inside container
+Example 1 - Simplest usage with paragraph nodes inside a container
 
 	var txtlizer = $('#container');
 	txtlizer.textualizer();
 	txtlizer.textualizer('start');	
 
-Example 1 - Simple usage
+Example 2 - Simple usage
 
 	var list = ['This should provide'
 		, 'A lovely rendering experience'
@@ -21,7 +21,7 @@ Example 1 - Simple usage
 	txtlizer.textualizer(list);
 	txtlizer.textualizer('start');	
 	
-Example 2 - Change options
+Example 3 - Change options
 	
 	var list = ['This should provide'
 		, 'A lovely rendering experience'
@@ -34,7 +34,7 @@ Example 2 - Change options
 	});
 	txtlizer.textualizer('start');	
 	
-Example 3 - Initialize with data, and then change the data
+Example 4 - Initialize with data, and then change the data
 
 	var list = ['This should provide'
 		, 'A lovely rendering experience' 
