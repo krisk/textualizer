@@ -1,5 +1,5 @@
 /**
-Textualizer v2.3.0
+Textualizer v2.3.1
     
 Dual licensed under the MIT or GPL Version 2 licenses.
 
@@ -60,16 +60,15 @@ THE SOFTWARE.
                     } else if (args.length === 2) {
                         data = args[0];
                         options = args[1];
+                    } else {
+                        throw 'textualizer: invalid argument(s)';
                     }
 
-                    /*
-                    if (data.length == 0) {
+                    if (data.length === 0) {
                         ele.find("p").each(function () {
                             data.push($(this).text());
                         });
-                    } else {
-                        throw 'textualizer: invalid argument(s)';
-                    }*/
+                    }
 
                     ele.html("");
 
