@@ -47,9 +47,10 @@ THE SOFTWARE.
         $.fn.textualizer = function (data, options) {
             var args = arguments;
 
-            function get(ele) {
-                var txtlzr = ele.data('textualizer');
-                if (!txtlzr) {
+            // Creates a textualizer instance (if it doesn't already exist)
+            var txtlzr = (function (ele) {
+                var obj = ele.data('textualizer');
+                if (!obj) {
                     var data = [],
                         options;
 
@@ -68,16 +69,15 @@ THE SOFTWARE.
                         });
                     }
 
+                    // Clear the contents in the container, since this is where the blurbs will go
                     ele.html("");
 
-                    options = $.extend({}, $.fn.textualizer.defaults, options);
-                    txtlzr = new Textualizer(ele, data, options);
-                    ele.data('textualizer', txtlzr);
+                    // Create a textualizer instance, and store in the HTML node's metadata
+                    obj = new Textualizer(ele, data, $.extend({}, $.fn.textualizer.defaults, options));
+                    ele.data('textualizer', obj);
                 }
-                return txtlzr;
-            }
-
-            var txtlzr = get(this);
+                return obj;
+            })(this);
 
             if (typeof args[0] === 'string' && txtlzr[args[0]]) {
                 txtlzr[args[0]].apply(txtlzr, Array.prototype.slice.call(args, 1));
