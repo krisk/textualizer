@@ -5,7 +5,7 @@ See it in action: http://krisk.github.com/textualizer/
 Usage
 -----
 
-Example 0 - Simplest usage with <p> inside container
+Example 0 - Simplest usage with "<p>" inside container
 
 	var txtlizer = $('#container');
 	txtlizer.textualizer();
