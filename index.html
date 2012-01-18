@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>textualizer</title>
+    <title>Textualizer</title>
+    <meta name="description" content="Textualizer is a jQuery plugin that lets you transition through blurbs of text">
+    <meta name="keywords" content="jQuery, jQuery plugin, text animation, text transition">
     <script type="text/javascript" src="javascript/prettify.js"></script>
     <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
     <script src="javascript/textualizer.js"></script>
-    <link href="http://fonts.googleapis.com/css?family=Amaranth:400,700" rel="stylesheet" type="text/css">
     <link href="style/prettify.css" type="text/css" rel="stylesheet" />
     <link href="style/main.css" rel="stylesheet" type="text/css"></style>
     <script type="text/javascript">
@@ -89,19 +90,20 @@
       If you like textualizer and use it in the wild let me know.
     </p>
   </body>
-  <script type="text/javascript">
+  <script>
     $(function() {
-          prettyPrint();
+        prettyPrint();
 
-          var list = ['Textualizer is a jQuery plug-in that allows you to transition through blurbs of text. Just like this...'
-                    ,'When transitioning to a new blurb, any character that is common to the next blurb is kept on the screen, and moved to its new position.'
-                    , 'Textualize: verb - to put into text, set down as concrete and unchanging.  Use Textualizer to transition through blurbs of text.'
-                    , 'Blurb: noun - a short summary or some words of praise accompanying a creative work.  A promotional description.'];
+        var list = ['Textualizer is a jQuery plug-in that allows you to transition through blurbs of text. Just like this...'
+                  ,'When transitioning to a new blurb, any character that is common to the next blurb is kept on the screen, and moved to its new position.'
+                  , 'Textualize: verb - to put into text, set down as concrete and unchanging.  Use Textualizer to transition through blurbs of text.'
+                  , 'Blurb: noun - a short summary or some words of praise accompanying a creative work.  A promotional description.'];
 
-          var txt = $('#txtlzr');
+        var txt = $('#txtlzr');
 
-          txt.textualizer(list, { duration: 3000 });
-          txt.textualizer('start');
-    })
+        txt.textualizer(list, { duration: 3000 });
+        txt.textualizer('start');
+    });
+
   </script>
 </html>
