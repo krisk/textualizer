@@ -64,7 +64,7 @@ THE SOFTWARE.
                     }
 
                     if (data.length === 0) {
-                        ele.find("p").each(function () {
+                        ele.find('p').each(function () {
                             data.push($(this).text());
                         });
                     }
@@ -164,19 +164,53 @@ THE SOFTWARE.
                 this.visited = false;
             }
 
-        function copyStyle(fromElem, toElem) {
-            var style;
+            // Gets all the styles (including the computed) from a given DOM element
+        function getStyle(dom) {
+
+            var style, styleList = {};
+
             if (window.getComputedStyle) {
-                styles = window.getComputedStyle(fromElem[0], null);
-                $.each(styles, function (key, value) {
-                    toElem.css(value, styles.getPropertyValue(value));
-                });
+
+                var camelize = function (a, b) {
+                        return b.toUpperCase();
+                    }
+
+                style = window.getComputedStyle(dom, null);
+
+                if (style.length) {
+                    for (var i = 0, len = style.length; i < len; i++) {
+                        var prop = style[i],
+                            camel = prop.replace(/\-([a-z])/, camelize),
+                            val = style.getPropertyValue(prop);
+
+                        styleList[camel] = val;
+                    }
+                } else {
+                    for (var prop in style) {
+                        if (typeof style[prop] !== 'function' && prop !== 'length') {
+                            styleList[prop] = style[prop];
+                        }
+                    }
+                }
+
+            } else if (dom.currentStyle) {
+                style = dom.currentStyle;
+
+                for (var prop in style) {
+                    styleList[prop] = style[prop];
+                }
+
             } else {
-                styles = fromElem[0].currentStyle;
-                $.each(styles, function (key, value) {
-                    toElem.css(key, value);
-                });
+                style = dom.style;
+
+                for (var prop in style) {
+                    if (typeof style[prop] !== 'function' && prop !== 'length') {
+                        styleList[prop] = style[prop];
+                    }
+                }
             }
+
+            return styleList;
         }
 
         var Textualizer = function (element, data, options) {
@@ -187,7 +221,7 @@ THE SOFTWARE.
                 var clone = element.clone().removeAttr('id').appendTo(document.body);
 
                 // Copy all the styles.  This is especially necessary if the clone was being styled by id in a stylesheet)
-                copyStyle(element, clone);
+                clone.css(getStyle(element[0]));
 
                 // Note that the clone needs to be visible so we can do the proper calculation
                 // of the position of every character.  Ergo, move the clone outside of the window's 
