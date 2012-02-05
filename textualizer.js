@@ -192,21 +192,11 @@ THE SOFTWARE.
                         }
                     }
                 }
-
-            } else if (dom.currentStyle) {
-                style = dom.currentStyle;
+            } else {
+                style = dom.currentStyle || dom.style;
 
                 for (var prop in style) {
                     styleList[prop] = style[prop];
-                }
-
-            } else {
-                style = dom.style;
-
-                for (var prop in style) {
-                    if (typeof style[prop] !== 'function' && prop !== 'length') {
-                        styleList[prop] = style[prop];
-                    }
                 }
             }
 
