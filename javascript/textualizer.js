@@ -210,11 +210,12 @@ THE SOFTWARE.
 
         var self = this;
 
-        // If the an effect is chosen, then look for it in the list of effects
+        // If an effect is chosen, then look for it in the list of effects
         if (this.options.effect !== 'random') {
             $.each($.fn.textualizer.effects, function () {
                 if (this.name === options.effect) {
                     self._showCharEffect = this.fn;
+                    return false; // break;
                 }
             });
         }
