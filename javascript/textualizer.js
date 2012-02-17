@@ -88,7 +88,8 @@ THE SOFTWARE.
         effect: 'random',
         duration: 2000,
         rearrangeDuration: 1000,
-        centered: false
+        centered: false,
+        loop: true
     };
 
     // Effects for characters transition+animation. Customize as you please
@@ -296,10 +297,17 @@ THE SOFTWARE.
                     setTimeout(function () {
                         // If we've reached the last blurb, reset the position of every character in every blurb
                         if (i === self.list.length - 1) {
-                            i = -1;
-                            $.each(self.blurbs, function (j, item) {
-                                item.reset();
-                            });
+                            
+                            // If loop=true, reset every character, and start at the 1st blurb
+                            if (self.options.loop) {
+                                i = -1;
+                                $.each(self.blurbs, function (j, item) {
+                                    item.reset();
+                                });
+                            } else { // Other pause at the last blurb, and exit
+                                self.pause();
+                                return;
+                            }
                         }
                         i++;
                         self._index = i;
