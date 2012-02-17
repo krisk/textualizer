@@ -215,7 +215,7 @@ THE SOFTWARE.
             $.each($.fn.textualizer.effects, function () {
                 if (this.name === options.effect) {
                     self._showCharEffect = this.fn;
-                    return false; // break;
+                    return false; // break; 
                 }
             });
         }
@@ -273,7 +273,7 @@ THE SOFTWARE.
         },
         start: function () {
             // If there are no items, then simply exit
-            if (!this.list || this.list.length === 0) {
+            if (!this.list || this.list.length === 0 || this._playing) {
                 return;
             }
 
@@ -281,6 +281,7 @@ THE SOFTWARE.
                 index = this._index || 0,
                 $elem = this.elem;
 
+            this._playing = true;
             this._pause = false;
 
             // Begin transitioning through the items
@@ -296,23 +297,25 @@ THE SOFTWARE.
                     $elem.trigger('textualzer.blurbchanged', { index: i });
 
                     setTimeout(function () {
-                        // If we've reached the last blurb, reset the position of every character in every blurb
+                        // If we've reached the last blurb                            
                         if (i === self.list.length - 1) {
                             
-                            // If loop=true, reset every character, and start at the 1st blurb
-                            if (self.options.loop) {
-                                i = -1;
-                                $.each(self.blurbs, function (j, item) {
-                                    item.reset();
-                                });
-                            } else { // Other pause at the last blurb, and exit
+                            // Reset the position of every character in every blurb
+                            $.each(self.blurbs, function (j, item) {
+                                item.reset();
+                            });
+                            i = -1;
+                        
+                            // If loop=false, pause (i.e., pause at this last blurb)
+                            if (!self.options.loop) {
                                 self.pause();
-                                return;
                             }
                         }
+
                         i++;
                         self._index = i;
                         rotate(i); // rotate the next blurb
+
                     }, self.options.duration);
                 });
             }
@@ -322,6 +325,7 @@ THE SOFTWARE.
         },
         stop: function () {
             this.pause();
+            this._playing = false;
             this._previous = null;
             this._index = 0;
             this.container.empty();
@@ -329,6 +333,7 @@ THE SOFTWARE.
         },
         pause: function () {
             this._pause = true;
+            this._playing = false;
         },
         _rotate: function (index) {
             var dfd = $.Deferred(),
