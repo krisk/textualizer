@@ -1,3 +1,8 @@
+// ==ClosureCompiler==
+// @output_file_name default.js
+// @compilation_level SIMPLE_OPTIMIZATIONS
+// ==/ClosureCompiler==
+
 /**
 Textualizer v2.4.0
     
@@ -253,7 +258,7 @@ THE SOFTWARE.
         this._previous = null;
 
         this._position = {
-            bottom: element.height();
+            bottom: element.height()
         };
 
         this.blurbs = [];
