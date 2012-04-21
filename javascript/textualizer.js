@@ -1,5 +1,5 @@
 /**
-Textualizer v2.4.0
+Textualizer v2.5.0
 
 Dual licensed under the MIT or GPL Version 2 licenses.
 
@@ -23,117 +23,69 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-(function ($) {
-    var COMMON_CHARACTER_ARRANGE_DELAY = 1000,
+(function ($, window) {
+
+    "use strict";
+
+    var Textualizer,
+
+        COMMON_CHARACTER_ARRANGE_DELAY = 1000,
         REMAINING_CHARACTERS_DELAY = 500,
         EFFECT_DURATION = 2000,
         REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY = 2000,
         REMOVE_CHARACTERS_MAX_DELAY = 2000;
 
-    /**
-     * Overloads:
-     * 1. textualizer(data, options)
-     * 2. textualizer(data)
-     * 3. textualizer(options)
-     *
-     * @param data: Array of texts to transition
-     * @param options:
-     * <effect> - name of the effect to apply: random, fadeIn, slideLeft, slideTop.
-     * <duration> - Time (ms) to keep a blurb on the screen before transitioning to the next one
-     * <rearrangeDuration> - Time (ms) for characters to arrange into position
-     */
-    $.fn.textualizer = function (data, options) {
-        var args = arguments;
+    // Gets the computed style of an element
+    function getStyle(element) {
 
-        // Creates a textualizer instance (if it doesn't already exist)
-        var txtlzr = (function (ele) {
-            var obj = ele.data('textualizer');
-            if (!obj) {
-                var data = [],
-                    options;
+        var computedStyle, key, camelCasedStyle, i, len, styleList = {};
 
-                if (args.length === 1 && args[0] instanceof Array) {
-                    data = args[0];
-                } else if (args.length === 1 && typeof args[0] === 'object') {
-                    options = args[0];
-                } else if (args.length === 2) {
-                    data = args[0];
-                    options = args[1];
-                }
+        if (window.getComputedStyle) {
+            computedStyle = window.getComputedStyle(element, null);
 
-                if (data.length === 0) {
-                    ele.find('p').each(function () {
-                        data.push($(this).text());
+            if (computedStyle.length) {
+                for (i = 0, len = computedStyle.length; i < len; i++) {
+                    camelCasedStyle = computedStyle[i].replace(/\-([a-z])/, function (a, b) {
+                        return b.toUpperCase();
                     });
+
+                    styleList[camelCasedStyle] = computedStyle.getPropertyValue(computedStyle[i]);
                 }
-
-                // Clear the contents in the container, since this is where the blurbs will go
-                ele.html("");
-
-                // Create a textualizer instance, and store in the HTML node's metadata
-                obj = new Textualizer(ele, data, $.extend({}, $.fn.textualizer.defaults, options));
-                ele.data('textualizer', obj);
+            } else {
+                for (key in computedStyle) {
+                    if (typeof computedStyle[key] !== 'function' && key !== 'length') {
+                        styleList[key] = computedStyle[key];
+                    }
+                }
             }
-            return obj;
-        })(this);
+        } else {
+            computedStyle = element.currentStyle || element.style;
 
-        if (typeof args[0] === 'string' && txtlzr[args[0]]) {
-            txtlzr[args[0]].apply(txtlzr, Array.prototype.slice.call(args, 1));
+            for (key in computedStyle) {
+                if (Object.prototype.hasOwnProperty.call(computedStyle, key)) {
+                    styleList[key] = computedStyle[key];
+                }
+            }
         }
 
-        return this;
-    };
+        return styleList;
+    }
 
-    $.fn.textualizer.defaults = {
-        effect: 'random',
-        duration: 2000,
-        rearrangeDuration: 1000,
-        centered: false,
-        loop: true
-    };
+    function Character() {
+        this.character = null; // A character
+        this.domNode = null; // The span element that wraps around the character
+        this.pos = null; // The domNode position
+        this.used = false;
+        this.inserted = false;
+        this.visited = false;
+    }
 
-    // Effects for characters transition+animation. Customize as you please
-    $.fn.textualizer.effects = [{
-            name: 'none',
-            fn: function (item) {
-                this.container.append(item.domNode.show());
-            }
-        }, {
-            name: 'fadeIn',
-            fn: function (item, dfd) {
-                this.container.append(item.domNode.fadeIn(EFFECT_DURATION, dfd.resolve));
-                return dfd.promise();
-            }
-        }, {
-            name: 'slideLeft',
-            fn: function (item, dfd) {
-                item.domNode.appendTo(this.container).css({
-                    'left': -1000
-                }).show().animate({
-                    'left': item.pos.left
-                }, EFFECT_DURATION, dfd.resolve);
-
-                return dfd.promise();
-            }
-        }, {
-            name: 'slideTop',
-            fn: function (item, dfd) {
-                item.domNode.appendTo(this.container).css({
-                    'top': -1000
-                }).show().animate({
-                    'top': item.pos.top
-                }, EFFECT_DURATION, dfd.resolve);
-
-                return dfd.promise();
-            }
-        }];
-
-    function Blurb() {
+    function Snippet() {
         this.str = ''; // The text string
         this.characterList = []; // Array of ch objects
-    };
+    }
 
-    Blurb.prototype = {
+    Snippet.prototype = {
         // Loops through <characterList>, and find the first character that matches <val>, and hasn't been already used.
         use: function (val) {
             var ch = null;
@@ -157,64 +109,25 @@ THE SOFTWARE.
         }
     };
 
-    function Character() {
-        this.character = null; // A character
-        this.domNode = null; // The span element that wraps around the character
-        this.pos = null; // The domNode position
-        this.used = false;
-        this.inserted = false;
-        this.visited = false;
-    };
+    Textualizer = function ($element, data, options) {
+        var self = this,
+            list = [],
+            snippets,
 
-    // Gets all the styles (including the computed) from a given DOM element
-    function getStyle(dom) {
+            index, previous, showCharEffect = null,
 
-        var style, styleList = {};
+            playing = false,
+            paused = false,
 
-        if (window.getComputedStyle) {
-            style = window.getComputedStyle(dom, null);
+            elementHeight, position,
 
-            if (style.length) {
-                $.each(style, function () {
-                    var camel = this.replace(/\-([a-z])/, function (a, b) {
-                            return b.toUpperCase();
-                        }),
-                        val = style.getPropertyValue(this);
-
-                    styleList[camel] = val;
-                });
-            } else {
-                for (var prop in style) {
-                    if (typeof style[prop] !== 'function' && prop !== 'length') {
-                        styleList[prop] = style[prop];
-                    }
-                }
-            }
-        } else {
-            style = dom.currentStyle || dom.style;
-
-            for (var prop in style) {
-                if (Object.prototype.hasOwnProperty.call(style, prop)) {
-                    styleList[prop] = style[prop];
-                };
-            }
-        }
-
-        return styleList;
-    };
-
-    function Textualizer(element, data, options) {
-        this.options = options;
-
-        this._showCharEffect = null;
-
-        var self = this;
+            $clone, $container, $phantomContainer;
 
         // If an effect is chosen, then look for it in the list of effects
-        if (this.options.effect !== 'random') {
+        if (options.effect !== 'random') {
             $.each($.fn.textualizer.effects, function () {
-                if (this.name === options.effect) {
-                    self._showCharEffect = this.fn;
+                if (this[0] === options.effect) {
+                    showCharEffect = this[1];
                     return false; // break;
                 }
             });
@@ -222,294 +135,410 @@ THE SOFTWARE.
 
         // Clone the target element, and remove the id attribute (if it has one)
         // Why remove the id? Cuz when we clone an element, the id is also copied.  That's a very bad thing,
-        var clone = element.clone().removeAttr('id').appendTo(document.body);
+        $clone = $element.clone().removeAttr('id').appendTo(window.document.body);
 
         // Copy all the styles.  This is especially necessary if the clone was being styled by id in a stylesheet)
-        clone.css(getStyle(element[0]));
+        $clone.css(getStyle($element[0]));
 
         // Note that the clone needs to be visible so we can do the proper calculation
         // of the position of every character.  Ergo, move the clone outside of the window's
         // visible area.
-        clone.css({
+        $clone.css({
             position: 'absolute',
             top: '-1000px'
         });
 
-        this.phantomContainer = $('<div />').css({
+        $phantomContainer = $('<div />').css({
             'position': 'relative',
             'visibility': 'hidden'
-        }).appendTo(clone);
+        }).appendTo($clone);
 
         // Make sure any animating character disappear when outside the boundaries of
         // the element
-        element.css('overflow', 'hidden');
-
-        this.elementHeight = element.height();
+        $element.css('overflow', 'hidden');
 
         // Contains transitioning text
-        this.container = $('<div />').css('position', 'relative').appendTo(element);
+        $container = $('<div />').css('position', 'relative').appendTo($element);
 
-        // Holds the previous blurb
-        this._previous = null;
+        elementHeight = $element.height();
 
-        this._position = {
-            bottom: element.height()
+        position = {
+            bottom: elementHeight
         };
 
-        this.blurbs = [];
+        function positionSnippet(snippet, phantomSnippets) {
+            // If options.centered is true, then we need to center the text.
+            // This cannot be done solely with CSS, because of the absolutely positioned characters
+            // within a relative container.  Ergo, to achieve a vertically-aligned look, do
+            // the following simple math:
+            var yOffset = options.centered ? (elementHeight - $phantomContainer.height()) / 2 : 0;
 
-        this.elem = element;
+            // Figure out the positioning, and clone the character's domNode
+            $.each(phantomSnippets, function (index, c) {
+                c.pos = c.domNode.position();
+                c.domNode = c.domNode.clone();
+
+                c.pos.top += yOffset;
+
+                c.domNode.css({
+                    'left': c.pos.left,
+                    'top': c.pos.top,
+                    'position': 'absolute'
+                });
+
+                snippet.characterList.push(c);
+            });
+
+            $phantomContainer.html('');
+        }
+
+        /* PRIVATE FUNCTIONS */
+
+        // Add all chars first to the phantom container. Let the browser deal with the formatting.
+        function addCharsToSnippet(i) {
+            var phantomSnippets = [],
+                snippet = new Snippet(),
+                j, ch, c, len;
+
+            snippet.str = list[i];
+            snippets.push(snippet);
+
+            for (j = 0, len = snippet.str.length; j < len; j++) {
+                ch = snippet.str.charAt(j);
+
+                if (ch === '') {
+                    $phantomContainer.append(' ');
+                } else {
+                    c = new Character();
+                    c.character = ch;
+                    c.domNode = $('<span/>').text(ch);
+
+                    $phantomContainer.append(c.domNode);
+                    phantomSnippets.push(c);
+                }
+            }
+
+            positionSnippet(snippet, phantomSnippets);
+
+            return snippet;
+        }
+
+        function getHideEffect() {
+            var dfd, eff;
+
+            eff = [
+
+            function (target) {
+                dfd = $.Deferred();
+                target.animate({
+                    top: position.bottom,
+                    opacity: 'hide'
+                }, dfd.resolve);
+                return dfd.promise();
+            }, function (target) {
+                dfd = $.Deferred();
+                target.fadeOut(1000, dfd.resolve);
+                return dfd.promise();
+            }];
+
+            return eff[Math.floor(Math.random() * eff.length)];
+        }
+
+        function removeCharacters(previousSnippet, currentSnippet) {
+            var keepList = [],
+                removeList = [],
+                finalDfd = $.Deferred(),
+                hideEffect = getHideEffect(),
+                currChar;
+
+            // For every character in the previous text, check if it exists in the current text.
+            // YES ==> keep the character in the DOM
+            // NO ==> remove the character from the DOM
+            $.each(previousSnippet.characterList, function (index, prevChar) {
+                currChar = currentSnippet.use(prevChar.character);
+
+                if (currChar) {
+                    currChar.domNode = prevChar.domNode; // use the previous DOM domNode
+                    currChar.inserted = true;
+
+                    keepList.push(currChar);
+                } else {
+                    (function hideCharacter(deferred) {
+                        removeList.push(deferred);
+                        hideEffect(prevChar.domNode.delay(Math.random() * REMOVE_CHARACTERS_MAX_DELAY)).done(function () {
+                            prevChar.domNode.remove();
+                            deferred.resolve();
+                        });
+                    })($.Deferred());
+                }
+            });
+
+            $.when.apply(null, removeList).done(function () {
+                return finalDfd.resolve(keepList);
+            });
+
+            return finalDfd.promise();
+        }
+
+        function showCharacters(snippet) {
+            var effects = $.fn.textualizer.effects,
+
+                effect = options.effect === 'random' ? effects[Math.floor(Math.random() * (effects.length - 2)) + 1][1] : showCharEffect,
+
+                finalDfd = $.Deferred(),
+                animationDfdList = [];
+
+            // Iterate through all ch objects
+            $.each(snippet.characterList, function (index, ch) {
+                // If the character has not been already inserted, animate it, with a delay
+                if (!ch.inserted) {
+
+                    ch.domNode.css({
+                        'left': ch.pos.left,
+                        'top': ch.pos.top
+                    });
+
+                    (function animateCharacter(deferred) {
+                        window.setTimeout(function () {
+                            effect({
+                                item: ch,
+                                container: $container,
+                                dfd: deferred
+                            });
+                        }, Math.random() * REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY);
+                        animationDfdList.push(deferred);
+                    })($.Deferred());
+
+                }
+            });
+
+            // When all characters have finished moving to their position, resolve the final promise
+            $.when.apply(null, animationDfdList).done(function () {
+                finalDfd.resolve();
+            });
+
+            return finalDfd.promise();
+        }
+
+        function moveAndShowRemainingCharacters(characters, currentSnippet) {
+            var finalDfd = $.Deferred(),
+                rearrangeDfdList = [];
+
+            // Move charactes that are common to their new position
+            window.setTimeout(function () {
+                $.each(characters, function (index, item) {
+
+                    (function rearrangeCharacters(deferred) {
+                        item.domNode.animate({
+                            'left': item.pos.left,
+                            'top': item.pos.top
+                        }, options.rearrangeDuration, deferred.resolve);
+                        rearrangeDfdList.push(deferred.promise());
+                    })($.Deferred());
+
+                });
+                // When all the characters have moved to their new position, show the remaining characters
+                $.when.apply(null, rearrangeDfdList).done(function () {
+                    window.setTimeout(function () {
+                        showCharacters(currentSnippet).done(function () {
+                            finalDfd.resolve();
+                        });
+                    }, REMAINING_CHARACTERS_DELAY);
+                });
+            }, COMMON_CHARACTER_ARRANGE_DELAY);
+
+            return finalDfd.promise();
+        }
+
+        function rotater() {
+            // If we've reached the last snippet
+            if (index === list.length - 1) {
+
+                // Reset the position of every character in every snippet
+                $.each(snippets, function (j, snippet) {
+                    snippet.reset();
+                });
+                index = -1;
+
+                // If loop=false, pause (i.e., pause at this last blurb)
+                if (!options.loop) {
+                    self.pause();
+                }
+            }
+
+            index++;
+            next(index); // rotate the next snippet
+        }
+
+        function rotate(i) {
+            var dfd = $.Deferred(),
+                current = snippets[i];
+
+            // If this is the first time the blurb is encountered, each character in the blurb is wrapped in
+            // a span and appended to an invisible container, thus we're able to calculate the character's position
+            if (!current) {
+                current = addCharsToSnippet(i);
+            }
+
+            if (previous) {
+                removeCharacters(previous, current).done(function (characters) {
+                    moveAndShowRemainingCharacters(characters, current).done(function () {
+                        dfd.resolve();
+                    });
+                });
+
+            } else {
+                showCharacters(current).done(function () {
+                    dfd.resolve();
+                });
+            }
+
+            previous = current;
+
+            return dfd.promise();
+        }
+
+        function next(i) {
+            if (paused) {
+                return;
+            }
+
+            // <rotate> returns a promise, which completes when a blurb has finished animating.  When that
+            // promise is fulfilled, transition to the next blurb.
+            rotate(i).done(function () {
+                $element.trigger('textualzer.blurbchanged', {
+                    index: i
+                });
+                window.setTimeout(rotater, options.duration);
+            });
+        }
+
+        /* PRIVILEDGED FUNCTIONS */
+
+        this.data = function (dataSource) {
+            this.stop();
+            list = dataSource;
+            snippets = [];
+        };
+
+        this.stop = function () {
+            this.pause();
+            playing = false;
+            previous = null;
+            index = 0;
+            $container.empty();
+            $phantomContainer.empty();
+        };
+
+        this.pause = function () {
+            paused = true;
+            playing = false;
+        };
+
+        this.start = function () {
+            if (list.length === 0 || playing) {
+                return;
+            }
+
+            index = index || 0;
+            playing = true;
+            paused = false;
+
+            next(index);
+        };
+
+        this.destroy = function () {
+            $container.parent().removeData('textualizer').end().remove();
+
+            $phantomContainer.remove();
+        };
 
         if (data && data instanceof Array) {
             this.data(data);
         }
     };
 
-    Textualizer.prototype = {
-        data: function (d) {
-            this.stop();
-            this.list = d;
-            this.blurbs = [];
-        },
-        start: function () {
-            // If there are no items, then simply exit
-            if (!this.list || this.list.length === 0 || this._playing) {
-                return;
-            }
+    $.fn.textualizer = function ( /*args*/ ) {
+        var args = arguments,
+            snippets, options, instance, txtlzr;
 
-            var self = this,
-                index = this._index || 0,
-                $elem = this.elem;
+        // Creates a textualizer instance (if it doesn't already exist)
+        txtlzr = (function ($element) {
 
-            this._playing = true;
-            this._pause = false;
+            instance = $element.data('textualizer');
 
-            var rotater = (function (self) {
-                return function() {
-                    // If we've reached the last blurb
-                    if (index === self.list.length - 1) {
+            if (!instance) {
+                snippets = [];
 
-                        // Reset the position of every character in every blurb
-                        $.each(self.blurbs, function (j, item) {
-                            item.reset();
-                        });
-                        index = -1;
-
-                        // If loop=false, pause (i.e., pause at this last blurb)
-                        if (!self.options.loop) {
-                            self.pause();
-                        }
-                    }
-
-                    index++;
-                    self._index = index;
-                    rotate(index); // rotate the next blurb
-                }
-            })(this);
-
-            // Begin transitioning through the items
-            function rotate(i) {
-                if (self._pause) {
-                    return;
+                if (args.length === 1 && args[0] instanceof Array) {
+                    snippets = args[0];
+                } else if (args.length === 1 && typeof args[0] === 'object') {
+                    options = args[0];
+                } else if (args.length === 2) {
+                    snippets = args[0];
+                    options = args[1];
                 }
 
-                // <_rotate> returns a promise, which completes when a blurb has finished animating.  When that
-                // promise is fulfilled, transition to the next blurb.
-                self._rotate(i).done(function () {
-                    $elem.trigger('textualzer.blurbchanged', { index: i });
-                    setTimeout(rotater, self.options.duration);
-                });
-            }
-
-            // Begin iterating through the list of blurbs to display
-            rotate(index);
-        },
-        stop: function () {
-            this.pause();
-            this._playing = false;
-            this._previous = null;
-            this._index = 0;
-            this.container.empty();
-            this.phantomContainer.empty();
-        },
-        pause: function () {
-            this._pause = true;
-            this._playing = false;
-        },
-        _rotate: function (index) {
-            var dfd = $.Deferred(),
-                current = this.blurbs[index];
-
-            // If this is the first time the blurb is encountered, each character in the blurb is wrapped in
-            // a span and appended to an invisible container, thus we're able to calculate the character's position
-            if (!current) {
-                var phantomBlurbs = [],
-                    i, len, ch, c;
-
-                current = new Blurb();
-                current.str = this.list[index];
-                this.blurbs.push(current);
-
-                // Add all chars first to the phantom container. Let the browser deal with the formatting.
-                for (i = 0, len = current.str.length; i < len; i++) {
-                    ch = current.str.charAt(i);
-
-                    if (ch === '') {
-                        this.phantomContainer.append(' ');
-                    } else {
-                        c = new Character();
-                        c.character = ch;
-                        c.domNode = $('<span/>').text(ch);
-
-                        this.phantomContainer.append(c.domNode);
-                        phantomBlurbs.push(c);
-                    }
-                }
-
-                // If options.centered is true, then we need to center the text.
-                // This cannot be done solely with CSS, because of the absolutely positioned characters
-                // within a relative container.  Ergo, to achieve a vertically-aligned look, do
-                // the following simple math:
-                var height = this.options.centered ? (this.elementHeight - this.phantomContainer.height()) / 2 : 0;
-
-                // Figure out the positioning, and clone the DOM domNode
-                $.each(phantomBlurbs, function (index, c) {
-                    c.pos = c.domNode.position();
-                    c.domNode = c.domNode.clone();
-
-                    c.pos.top += height;
-
-                    c.domNode.css({
-                        'left': c.pos.left,
-                        'top': c.pos.top,
-                        'position': 'absolute'
+                if (snippets.length === 0) {
+                    $element.find('p').each(function () {
+                        snippets.push($(this).text());
                     });
-                    current.characterList.push(c);
-                });
+                }
 
-                this.phantomContainer.html('');
+                // Clear the contents in the container, since this is where the blurbs will go
+                $element.html("");
+
+                // Create a textualizer instance, and store in the HTML node's metadata
+                instance = new Textualizer($element, snippets, $.extend({}, $.fn.textualizer.defaults, options));
+                $element.data('textualizer', instance);
             }
 
-            if (this._previous) {
-                // For every character in the previous text, check if it exists in the current text.
-                // YES ==> keep the character in the DOM
-                // NO ==> remove the character from the DOM
-                var self = this,
-                    keepList = [],
-                    removeList = [],
-                    dfds = [],
-                    randomHideEffect = getRandomHideEffect.call(this);
+            return instance;
 
-                $.each(this._previous.characterList, function (index, prevC) {
-                    var currC = current.use(prevC.character);
+        })(this);
 
-                    if (currC) {
-                        currC.domNode = prevC.domNode; // use the previous DOM domNode
-                        currC.inserted = true;
-
-                        keepList.push(currC);
-                    } else {
-                        var d = $.Deferred();
-                        removeList.push(d);
-
-                        randomHideEffect(prevC.domNode.delay(Math.random() * REMOVE_CHARACTERS_MAX_DELAY)).done(function () {
-                            prevC.domNode.remove();
-                            d.resolve();
-                        });
-                    }
-                });
-
-                // When all characters that aren't common to the blurbs have been removed...
-                $.when.apply(null, removeList).done(function () {
-                    // Move charactes that are common to their new position
-                    setTimeout(function () {
-                        $.each(keepList, function (index, item) {
-                            var d = $.Deferred();
-                            item.domNode.animate({
-                                'left': item.pos.left,
-                                'top': item.pos.top
-                            }, self.options.rearrangeDuration, d.resolve);
-                            dfds.push(d.promise());
-                        });
-                        // When all the characters have moved to their new position, show the remaining characters
-                        $.when.apply(null, dfds).done(function () {
-                            setTimeout(function () {
-                                showCharacters.call(self, current).done(function () {
-                                    dfd.resolve();
-                                });
-                            }, REMAINING_CHARACTERS_DELAY);
-                        });
-                    }, COMMON_CHARACTER_ARRANGE_DELAY);
-                });
-
-            } else {
-                showCharacters.call(this, current).done(function () {
-                    dfd.resolve();
-                });
-            }
-            this._previous = current;
-
-            return dfd.promise();
-        },
-        destroy: function () {
-            this.container.parent().removeData('textualizer').end().remove();
-            this.phantomContainer.remove();
+        if (typeof args[0] === 'string' && txtlzr[args[0]]) {
+            txtlzr[args[0]].apply(txtlzr, Array.prototype.slice.call(args, 1));
         }
+
+        return this;
     };
 
-    function getRandomHideEffect() {
-        var self = this;
-        var eff = [
-            function (target) {
-                var d = $.Deferred();
-                target.animate({
-                    top: self._position.bottom,
-                    opacity: 'hide'
-                }, d.resolve);
-                return d.promise();
-            },
-            function (target) {
-                var d = $.Deferred();
-                target.fadeOut(1000, d.resolve);
-                return d.promise();
-            }
-        ];
-
-        return eff[Math.floor(Math.random() * eff.length)];
+    $.fn.textualizer.defaults = {
+        effect: 'random',
+        duration: 2000,
+        rearrangeDuration: 1000,
+        centered: false,
+        loop: true
     };
 
-    function showCharacters(item) {
-        var self = this,
-            effects = $.fn.textualizer.effects,
-            effect = this.options.effect === 'random'
-                    ? effects[Math.floor(Math.random() * (effects.length - 2)) + 1].fn
-                    : this._showCharEffect, finalDfd = $.Deferred(), animationDfdList = [];
+    // Effects for characters transition+animation. Customize as you please
+    $.fn.textualizer.effects = [
+        ['none', function (obj) {
+            obj.container.append(obj.item.domNode.show());
+        }],
+        ['fadeIn', function (obj) {
+            obj.container.append(obj.item.domNode.fadeIn(EFFECT_DURATION, obj.dfd.resolve));
+            return obj.dfd.promise();
+        }],
+        ['slideLeft', function (obj) {
+            obj.item.domNode.appendTo(obj.container).css({
+                'left': -1000
+            }).show().animate({
+                'left': obj.item.pos.left
+            }, EFFECT_DURATION, obj.dfd.resolve);
 
-        // Iterate through all ch objects
-        $.each(item.characterList, function (index, ch) {
-            // If the character has not been already inserted, animate it, with a delay
-            if (!ch.inserted) {
-                ch.domNode.css({
-                    'left': ch.pos.left,
-                    'top': ch.pos.top
-                });
+            return obj.dfd.promise();
+        }],
+        ['slideTop', function (obj) {
+            obj.item.domNode.appendTo(obj.container).css({
+                'top': -1000
+            }).show().animate({
+                'top': obj.item.pos.top
+            }, EFFECT_DURATION, obj.dfd.resolve);
 
-                var animationDfd = $.Deferred();
+            return obj.dfd.promise();
+        }]
+    ];
 
-                setTimeout(function () {
-                    effect.call(self, ch, animationDfd);
-                }, Math.random() * REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY);
-
-                animationDfdList.push(animationDfd);
-            }
-        });
-
-        // When all characters have finished moving to their position, resolve the final promise
-        $.when.apply(null, animationDfdList).done(function () {
-            finalDfd.resolve();
-        });
-
-        return finalDfd.promise();
-    };
-
-})(jQuery);
+})(jQuery, window);
