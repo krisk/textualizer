@@ -1,11 +1,6 @@
-// ==ClosureCompiler==
-// @output_file_name default.js
-// @compilation_level SIMPLE_OPTIMIZATIONS
-// ==/ClosureCompiler==
-
 /**
 Textualizer v2.4.0
-    
+
 Dual licensed under the MIT or GPL Version 2 licenses.
 
 Copyright (c) 2011 Kirollos Risk
@@ -132,7 +127,7 @@ THE SOFTWARE.
                 return dfd.promise();
             }
         }];
-        
+
     function Blurb() {
         this.str = ''; // The text string
         this.characterList = []; // Array of ch objects
@@ -199,7 +194,7 @@ THE SOFTWARE.
             style = dom.currentStyle || dom.style;
 
             for (var prop in style) {
-                if (style.hasOwnProperty(prop)) {
+                if (Object.prototype.hasOwnProperty.call(style, prop)) {
                     styleList[prop] = style[prop];
                 };
             }
@@ -220,7 +215,7 @@ THE SOFTWARE.
             $.each($.fn.textualizer.effects, function () {
                 if (this.name === options.effect) {
                     self._showCharEffect = this.fn;
-                    return false; // break; 
+                    return false; // break;
                 }
             });
         }
@@ -233,7 +228,7 @@ THE SOFTWARE.
         clone.css(getStyle(element[0]));
 
         // Note that the clone needs to be visible so we can do the proper calculation
-        // of the position of every character.  Ergo, move the clone outside of the window's 
+        // of the position of every character.  Ergo, move the clone outside of the window's
         // visible area.
         clone.css({
             position: 'absolute',
@@ -245,13 +240,13 @@ THE SOFTWARE.
             'visibility': 'hidden'
         }).appendTo(clone);
 
-        // Make sure any animating character disappear when outside the boundaries of 
+        // Make sure any animating character disappear when outside the boundaries of
         // the element
         element.css('overflow', 'hidden');
 
         this.elementHeight = element.height();
 
-        // Contains transitioning text           
+        // Contains transitioning text
         this.container = $('<div />').css('position', 'relative').appendTo(element);
 
         // Holds the previous blurb
@@ -291,15 +286,15 @@ THE SOFTWARE.
 
             var rotater = (function (self) {
                 return function() {
-                    // If we've reached the last blurb                            
+                    // If we've reached the last blurb
                     if (index === self.list.length - 1) {
-                        
+
                         // Reset the position of every character in every blurb
                         $.each(self.blurbs, function (j, item) {
                             item.reset();
                         });
                         index = -1;
-                    
+
                         // If loop=false, pause (i.e., pause at this last blurb)
                         if (!self.options.loop) {
                             self.pause();
@@ -318,7 +313,7 @@ THE SOFTWARE.
                     return;
                 }
 
-                // <_rotate> returns a promise, which completes when a blurb has finished animating.  When that 
+                // <_rotate> returns a promise, which completes when a blurb has finished animating.  When that
                 // promise is fulfilled, transition to the next blurb.
                 self._rotate(i).done(function () {
                     $elem.trigger('textualzer.blurbchanged', { index: i });
@@ -373,7 +368,7 @@ THE SOFTWARE.
 
                 // If options.centered is true, then we need to center the text.
                 // This cannot be done solely with CSS, because of the absolutely positioned characters
-                // within a relative container.  Ergo, to achieve a vertically-aligned look, do 
+                // within a relative container.  Ergo, to achieve a vertically-aligned look, do
                 // the following simple math:
                 var height = this.options.centered ? (this.elementHeight - this.phantomContainer.height()) / 2 : 0;
 
@@ -472,7 +467,7 @@ THE SOFTWARE.
                     opacity: 'hide'
                 }, d.resolve);
                 return d.promise();
-            }, 
+            },
             function (target) {
                 var d = $.Deferred();
                 target.fadeOut(1000, d.resolve);
@@ -486,8 +481,8 @@ THE SOFTWARE.
     function showCharacters(item) {
         var self = this,
             effects = $.fn.textualizer.effects,
-            effect = this.options.effect === 'random' 
-                    ? effects[Math.floor(Math.random() * (effects.length - 2)) + 1].fn 
+            effect = this.options.effect === 'random'
+                    ? effects[Math.floor(Math.random() * (effects.length - 2)) + 1].fn
                     : this._showCharEffect, finalDfd = $.Deferred(), animationDfdList = [];
 
         // Iterate through all ch objects
