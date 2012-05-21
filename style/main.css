@@ -102,3 +102,7 @@ p {
 #browsers li {
     line-height: 1.4em;
 }
+.separator {
+    border-top: 1px solid #AEAEAE;
+    margin: 30px 0;
+}
