@@ -1,5 +1,5 @@
 html {
-    
+
 }
 body {
 	margin-top: 1.0em;
@@ -73,11 +73,11 @@ p {
     border: 3px solid #EEEEEE;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
     float: left;
-    margin: 0 16px 50px 0;
+    margin-right: 16px;
 }
 #api {
     list-style: none;
-    padding: 0;        
+    padding: 0;
 }
 #api li {
     padding: 10px 0;
@@ -86,11 +86,11 @@ p {
     padding-top: 0;
 }
 #api li {
-    border-bottom: 1px solid #AEAEAE;    
+    border-bottom: 1px solid #AEAEAE;
 }
 #api li:last-child {
     border-bottom: 0;
-    padding-bottom: 0;  
+    padding-bottom: 0;
 }
 #api p {
    margin: 0;
