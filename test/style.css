@@ -1,0 +1,39 @@
+.sliderGalleryContainer {
+  display: inline-block;
+}
+.sliderGallery {
+  width: 416px;
+  overflow: hidden;
+
+  border: 1px solid black;
+  position: relative;
+  height: 40px;
+}
+.sliderGallery ul {
+  list-style: none;
+  width: 1000px;
+  overflow: hidden;
+
+  position: absolute;
+
+  margin: 0;
+  padding: 0;
+}
+.sliderGallery ul li {
+  float: left;
+}
+
+.active_img {
+  display: inline-block;
+}
+
+.list_inner {
+  width: 30px;
+  text-align: center;
+  padding: 10px 0;
+  border: 1px solid black;
+}
+
+.selected {
+  background-color: red;
+}
