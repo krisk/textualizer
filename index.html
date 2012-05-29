@@ -4,11 +4,19 @@
     <title>Textualizer</title>
     <meta name="description" content="Textualizer is a jQuery plugin that lets you transition through blurbs of text">
     <meta name="keywords" content="jQuery, jQuery plugin, text animation, text transition">
-    <script type="text/javascript" src="javascript/prettify.js"></script>
+
     <script src="http://code.jquery.com/jquery.min.js"></script>
     <script src="javascript/textualizer.js"></script>
-    <link href="style/prettify.css" type="text/css" rel="stylesheet" />
+
+    <script src="http://www.kiro.me/javascript/lib/prettify.js"></script>
+    <link href="http://www.kiro.me/style/prettify.css" type="text/css" rel="stylesheet" />
+    <link href="http://www.kiro.me/style/default.css" type="text/css" rel="stylesheet" />
+    <link href="http://www.kiro.me/style/project.css" type="text/css" rel="stylesheet" />
+
     <link href="style/main.css" rel="stylesheet" type="text/css"></style>
+
+    <link href='http://fonts.googleapis.com/css?family=Bilbo' rel='stylesheet' type='text/css'>
+
     <script type="text/javascript">
 
       var _gaq = _gaq || [];
@@ -24,98 +32,95 @@
     </script>
   </head>
   <body>
-      <a href="http://github.com/krisk/textualizer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-      <div id="container">
-        <h1>textualizer</h1>
-          <div id="txtlzr">
-          </div>
-        <div id="download">
-          <a href="javascript/textualizer.js">textualizer.js <span>(12.67 kb)</span></a>
-          <a href="javascript/textualizer.min.js">textualizer.min.js <span>(4.83 kb)</span></a>
-        </div>
-        <h2>Usage</h2>
-          <pre class="prettyprint">
-  var list = ['first blurb', 'second blurb', 'third blurb'];  // list of blurbs
 
-  var txt = $('#txtlzr');  // The container in which to render the list
+    <header>
+      <a href="http://www.kiro.me" id="logo">K. Risk</a>
+      <nav id="site-nav">
+        <ul id="site-menu">
+          <li><a href="http://www.kiro.me/">Home</a></li>
+          <li><a href="http://www.kiro.me/projects.html">Projects</a></li>
+          <li><a href="http://www.kiro.me/about.html">About me</a></li>
+        </ul>
+      </nav>
+    </header>
 
-  var options = {
-    duration: 1000,          // Time (ms) each blurb will remain on screen
-    rearrangeDuration: 1000, // Time (ms) a character takes to reach its position
-    effect: 'random',        // Animation effect the characters use to appear
-    centered: true           // Centers the text relative to its container
-  }
+    <a href="http://github.com/krisk/textualizer"><img class="github-fork" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
-  txt.textualizer(list, options); // textualize it!
-  txt.textualizer('start'); // start</pre>
+    <div id="container">
+      <h1>textualizer</h1>
+      <div id="txtlzr"></div>
+
+      <div id="download">
+        <a href="javascript/textualizer.js">textualizer.js <span>(12.67 kb)</span></a>
+        <a href="javascript/textualizer.min.js">textualizer.min.js <span>(4.83 kb)</span></a>
+      </div>
+
+      <h2>Usage</h2>
+      <pre class="prettyprint">
+var list = ['first blurb', 'second blurb', 'third blurb'];  // list of blurbs
+
+var txt = $('#txtlzr');  // The container in which to render the list
+
+var options = {
+  duration: 1000,          // Time (ms) each blurb will remain on screen
+  rearrangeDuration: 1000, // Time (ms) a character takes to reach its position
+  effect: 'random',        // Animation effect the characters use to appear
+  centered: true           // Centers the text relative to its container
+}
+
+txt.textualizer(list, options); // textualize it!
+txt.textualizer('start'); // start</pre>
+
       <h3>Animation effects</h3>
       <p>
         Textualizer currently has the following effects: <code>fadeIn</code>, <code>slideLeft</code>, <code>slideTop</code>, and <code>random</code>.  You can choose which effect to use by setting the <code>effect</code> option.
       </p>
+
       <h3>API</h3>
-        <ul id="api">
-          <li>
-            <code>.textualizer('pause')</code>
-            <p>Pauses all animation at the next blurb. That is, once all characters have finished moving to their position, the animation will pause.</p>
-          </li>
-          <li>
-            <code>.textualizer('stop')</code>
-            <p>Stops the animation, and removes the blurbs.</p>
-          </li>
-          <li>
-            <code>.textualizer('destroy')</code>
-            <p>Destroy and disposes of the textualizer instance.</p>
-          </li>
-        </ul>
-    <h2>Supported browsers</h2>
-    <img src="images/browsers.png">
-    <p>
-      Textualizer has been successfully tested in the following browsers:
-      <ul id="browsers">
-        <li>Chrome</li>
-        <li>Safari 4+</li>
-        <li>Firefox 3.5+</li>
-        <li>IE 6,7,8,9+</li>
-        <li>Opera 10.6+</li>
-        <li>Mobile Safari (iOS 4)</li>
+      <ul id="api">
+        <li>
+          <code>.textualizer('pause')</code>
+          <p>Pauses all animation at the next blurb. That is, once all characters have finished moving to their position, the animation will pause.</p>
+        </li>
+        <li>
+          <code>.textualizer('stop')</code>
+          <p>Stops the animation, and removes the blurbs.</p>
+        </li>
+        <li>
+          <code>.textualizer('destroy')</code>
+          <p>Destroy and disposes of the textualizer instance.</p>
+        </li>
       </ul>
-    </p>
 
-    <section>
-
-      <h2>Contact</h2>
+      <h2>Supported browsers</h2>
+      <img src="images/browsers.png">
       <p>
-        If you encounter any problems, please use the <a href="https://github.com/krisk/textualizer/issues">GitHub issue tracker</a> (GitHub account required).
-        <br />
-        For anything else, feel free to <a href="mailto:kirollos@gmail.com">email me</a>, or post a comment below.
-        <div style="clear:both;"></div>
+        Textualizer has been successfully tested in the following browsers:
+        <ul id="browsers">
+          <li>Chrome</li>
+          <li>Safari 4+</li>
+          <li>Firefox 3.5+</li>
+          <li>IE 6,7,8,9+</li>
+          <li>Opera 10.6+</li>
+          <li>Mobile Safari (iOS 4)</li>
+        </ul>
       </p>
 
-      <h3>About Me</h3>
-      <img id="profile-image" width="57" height="57" src="http://www.gravatar.com/avatar/4ae8dc54def0eb337f21fe40fa8972db?s=80">
-      <p>
-          My name's Kiro Risk, I'm a Senior Web Developer at <a href="http://www.linkedin.com/in/kirollos">LinkedIn</a>.  I work with JavaScript, HTML, CSS, Java, Python, MySQL and a plethora of other programming goodness every day.
-      </p>
-      <br/>
+      <section>
+        <h2>Contact</h2>
+        <p>
+          If you encounter any problems, please use the <a href="https://github.com/krisk/textualizer/issues">GitHub issue tracker</a> (GitHub account required).
+          <br />
+          For anything else, feel free to <a href="mailto:kirollos@gmail.com">email me</a>, or post a comment below.
+          <div style="clear:both;"></div>
+        </p>
+      </section>
 
-      <h4>Need something built?</h4>
-      <p>
-        If you have any ideas for something new and interesting, or would like some freelance done, <a href="mailto:kirollos@gmail.com">contact me</a>.
-      </p>
-      <a href="http://www.linkedin.com/in/kirollos" target="_blank">
-          <img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" border="0" alt="View Kirollos Risk's profile on LinkedIn">
-      </a>
+      <div class="separator"></div>
 
-      <h4>LinkedIn is hiring!</h4>
-      <p>
-        My company, <a href="http://www.linkedin.com" target="_blank">LinkedIn</a>, is hiring like mad.  So, if you're an engineer, and/or you have a passion for web development, then <a href="mailto:kirollos@gmail.com">contact me</a>!  Tell me a little about yourself, and if you have a LinkedIn profile, send me the link.  I'm quite fast at responding.
-      </p>
+      <div id="disqus_thread"></div>
 
-    </section>
-
-    <div class="separator"></div>
-
-    <div id="disqus_thread"></div>
+    </div>
     <script type="text/javascript">
         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
         var disqus_shortname = 'kiro';
