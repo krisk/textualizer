@@ -406,7 +406,7 @@ THE SOFTWARE.
             // <rotate> returns a promise, which completes when a blurb has finished animating.  When that
             // promise is fulfilled, transition to the next blurb.
             rotate(i).done(function () {
-                $element.trigger('textualzer.blurbchanged', {
+                $element.trigger('textualizer.blurbchanged', {
                     index: i
                 });
                 window.setTimeout(rotater, options.duration);
