@@ -1,5 +1,6 @@
 /**
 Textualizer v2.5.0
+@author Kirollos Risk
 
 Dual licensed under the MIT or GPL Version 2 licenses.
 
@@ -33,7 +34,9 @@ THE SOFTWARE.
         REMAINING_CHARACTERS_DELAY = 500,
         EFFECT_DURATION = 2000,
         REMAINING_CHARACTERS_APPEARANCE_MAX_DELAY = 2000,
-        REMOVE_CHARACTERS_MAX_DELAY = 2000;
+        REMOVE_CHARACTERS_MAX_DELAY = 2000,
+
+        EVENT_CHANGED = 'textualizer.changed';
 
     // Gets the computed style of an element
     function getStyle(element) {
@@ -406,7 +409,7 @@ THE SOFTWARE.
             // <rotate> returns a promise, which completes when a blurb has finished animating.  When that
             // promise is fulfilled, transition to the next blurb.
             rotate(i).done(function () {
-                $element.trigger('textualizer.blurbchanged', {
+                $element.trigger(EVENT_CHANGED, {
                     index: i
                 });
                 window.setTimeout(rotater, options.duration);
